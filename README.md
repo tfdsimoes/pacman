@@ -35,6 +35,8 @@ remaining in chase mode.
 The game starts with three lives. Clearing the maze advances to a reset board
 after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.
+Bonus fruit appears on a timer, remains available for a limited duration, and
+awards 100 points per level when Pac-Man reaches its location.
 
 ## Board layout
 

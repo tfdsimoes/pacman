@@ -5,11 +5,13 @@ import com.tfdsimoes.pacman.model.Ghost;
 import com.tfdsimoes.pacman.model.GhostMode;
 import com.tfdsimoes.pacman.model.GhostStrategyMode;
 import com.tfdsimoes.pacman.model.GhostType;
+import com.tfdsimoes.pacman.model.Fruit;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Tile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class GameSession {
     private static final int FRIGHTENED_DURATION_TICKS = 70;
@@ -23,6 +25,7 @@ public final class GameSession {
     private final Pacman pacman;
     private final List<Ghost> ghosts;
     private final GhostAi ghostAi = new GhostAi();
+    private final FruitManager fruitManager = new FruitManager();
     private int score;
     private int lives = 3;
     private int level = 1;
@@ -75,6 +78,10 @@ public final class GameSession {
         return ghosts;
     }
 
+    public Optional<Fruit> activeFruit() {
+        return fruitManager.activeFruit();
+    }
+
     public GhostStrategyMode ghostBehaviorMode() {
         return GhostBehaviorSchedule.modeAt(elapsedTicks);
     }
@@ -94,6 +101,7 @@ public final class GameSession {
             return;
         }
         ghosts.forEach(Ghost::advanceModeTick);
+        fruitManager.advance(board, level);
         pacman.tick(board);
         Tile eaten = board.consumeCollectible(pacman.position());
         score += switch (eaten) {
@@ -101,6 +109,7 @@ public final class GameSession {
             case POWER_PELLET -> 50;
             default -> 0;
         };
+        score += fruitManager.collectAt(pacman.position());
         if (eaten == Tile.POWER_PELLET) {
             ghosts.forEach(ghost -> ghost.frightenFor(FRIGHTENED_DURATION_TICKS));
         }
@@ -126,6 +135,7 @@ public final class GameSession {
         board.reset();
         pacman.reset(board.pacmanSpawn());
         ghosts.forEach(Ghost::reset);
+        fruitManager.reset();
         elapsedTicks = 0;
     }
 

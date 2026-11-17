@@ -68,6 +68,7 @@ public final class GamePanel extends JPanel {
         try {
             drawHud(canvas);
             drawBoard(canvas);
+            drawFruit(canvas);
             drawGhosts(canvas);
             drawPacman(canvas);
             drawStatus(canvas);
@@ -134,6 +135,18 @@ public final class GamePanel extends JPanel {
             canvas.fillRoundRect(position.x() * CELL_SIZE + 3, HUD_HEIGHT + position.y() * CELL_SIZE + 3,
                     CELL_SIZE - 6, CELL_SIZE - 6, 12, 12);
         }
+    }
+
+    private void drawFruit(Graphics2D canvas) {
+        game.activeFruit().ifPresent(fruit -> {
+            Position position = fruit.position();
+            int x = position.x() * CELL_SIZE;
+            int y = HUD_HEIGHT + position.y() * CELL_SIZE;
+            canvas.setColor(new Color(255, 75, 35));
+            canvas.fillOval(x + 5, y + 7, CELL_SIZE - 10, CELL_SIZE - 12);
+            canvas.setColor(new Color(80, 210, 80));
+            canvas.fillOval(x + CELL_SIZE / 2, y + 3, 8, 5);
+        });
     }
 
     private void drawPacman(Graphics2D canvas) {

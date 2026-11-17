@@ -8,7 +8,6 @@ import com.tfdsimoes.pacman.model.GhostStrategyMode;
 import com.tfdsimoes.pacman.model.GhostType;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
-import com.tfdsimoes.pacman.model.Tile;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public final class GhostAi {
 
         boolean frightened = ghost.mode() == GhostMode.FRIGHTENED;
         Position target = frightened ? pacman.position()
-                : nearestOpenPosition(board, targetFor(board, ghost, pacman, strategyMode, ghosts));
+                : board.nearestOpenPosition(targetFor(board, ghost, pacman, strategyMode, ghosts));
         Direction bestDirection = options.getFirst();
         int bestDistance = frightened ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         for (Direction direction : options) {
@@ -118,26 +117,6 @@ public final class GhostAi {
             return new Position(Math.floorMod(target.x(), board.width()), target.y());
         }
         return target;
-    }
-
-    private static Position nearestOpenPosition(Board board, Position target) {
-        Position nearest = null;
-        long bestDistance = Long.MAX_VALUE;
-        for (int y = 0; y < board.height(); y++) {
-            for (int x = 0; x < board.width(); x++) {
-                Position candidate = new Position(x, y);
-                if (board.tileAt(candidate) == Tile.WALL) {
-                    continue;
-                }
-                long distance = Math.abs((long) candidate.x() - target.x())
-                        + Math.abs((long) candidate.y() - target.y());
-                if (distance < bestDistance) {
-                    nearest = candidate;
-                    bestDistance = distance;
-                }
-            }
-        }
-        return nearest;
     }
 
     private static int shortestDistance(Board board, Position start, Position target) {
