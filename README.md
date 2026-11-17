@@ -29,6 +29,9 @@ resets the player and ghosts to their spawn positions.
 Power pellets frighten active ghosts for 70 game ticks; eating a frightened
 ghost awards 200 bonus points and sends it back to the ghost house before it
 re-enters play.
+Ghosts now move through the maze with deterministic shortest-path pursuit and
+per-ghost target behaviors. They alternate scatter and chase phases before
+remaining in chase mode.
 
 ## Board layout
 

@@ -8,6 +8,7 @@ public final class Ghost {
     private final GhostType type;
     private final Position spawn;
     private Position position;
+    private Direction direction = Direction.STOPPED;
     private GhostMode mode = GhostMode.NORMAL;
     private int frightenedTicksRemaining;
     private int eatenTicksRemaining;
@@ -30,7 +31,16 @@ public final class Ghost {
         return mode;
     }
 
-    public void moveTo(Position position) {
+    public Position spawn() {
+        return spawn;
+    }
+
+    public Direction direction() {
+        return direction;
+    }
+
+    public void move(Direction direction, Position position) {
+        this.direction = Objects.requireNonNull(direction);
         this.position = Objects.requireNonNull(position);
     }
 
@@ -61,6 +71,7 @@ public final class Ghost {
 
     public void reset() {
         position = spawn;
+        direction = Direction.STOPPED;
         mode = GhostMode.NORMAL;
         frightenedTicksRemaining = 0;
         eatenTicksRemaining = 0;
