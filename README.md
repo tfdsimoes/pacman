@@ -21,6 +21,9 @@ The application currently loads and prints the maze in the terminal. The game is
 being implemented in stages; the board layout is in
 `src/main/resources/boards/classic.txt`.
 
+Pac-Man movement is modeled in grid ticks with buffered turns, wall collision,
+and horizontal wrap-around at open tunnel endpoints.
+
 ## Board layout
 
 The UTF-8 board resource is a rectangular grid. `#` is a wall, `.` a pellet,
