@@ -24,6 +24,8 @@ refreshed, antialiased arcade-style presentation. The board layout is in
 
 In human mode, use the arrow keys or WASD to move. Movement uses grid ticks with
 buffered turns, wall collision, and horizontal wrap-around at the open tunnel endpoints.
+The game logic keeps its level-dependent grid tick interval while rendering at
+approximately 60 frames per second, interpolating sprite movement between ticks.
 Pellets are worth 10 points and power pellets 50 points; the score updates as
 items are collected, and the level completes when no pellets remain.
 Four ghosts start in the ghost house; in human mode, touching a normal ghost

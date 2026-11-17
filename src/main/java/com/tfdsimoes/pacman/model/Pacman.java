@@ -4,15 +4,21 @@ import java.util.Objects;
 
 public final class Pacman {
     private Position position;
+    private Position previousPosition;
     private Direction direction = Direction.STOPPED;
     private Direction requestedDirection = Direction.STOPPED;
 
     public Pacman(Position position) {
         this.position = Objects.requireNonNull(position);
+        previousPosition = position;
     }
 
     public Position position() {
         return position;
+    }
+
+    public Position previousPosition() {
+        return previousPosition;
     }
 
     public Direction direction() {
@@ -21,6 +27,7 @@ public final class Pacman {
 
     public void reset(Position position) {
         this.position = Objects.requireNonNull(position);
+        previousPosition = position;
         direction = Direction.STOPPED;
         requestedDirection = Direction.STOPPED;
     }
@@ -31,6 +38,7 @@ public final class Pacman {
 
     public void tick(Board board) {
         Objects.requireNonNull(board);
+        previousPosition = position;
         if (!board.contains(position) || board.tileAt(position) == Tile.WALL) {
             throw new IllegalStateException("Pac-Man must be on an open board tile");
         }

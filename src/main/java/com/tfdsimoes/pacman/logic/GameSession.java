@@ -100,6 +100,7 @@ public final class GameSession {
         if (gameOver()) {
             return;
         }
+        ghosts.forEach(Ghost::beginTick);
         if (levelComplete()) {
             if (levelClearTicksRemaining > 0 && --levelClearTicksRemaining == 0) {
                 advanceLevel();
