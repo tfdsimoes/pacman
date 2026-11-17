@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -38,8 +39,10 @@ public final class GamePanel extends JPanel {
 
     private final GameSession game;
     private final Timer timer;
+    private final Timer renderTimer;
     private final boolean aiControlled;
     private int animationFrame;
+    private long lastLogicTickNanos;
 
     public GamePanel(GameSession game) {
         this(game, false);
@@ -55,25 +58,34 @@ public final class GamePanel extends JPanel {
         if (!aiControlled) {
             configureKeyBindings();
         }
+        lastLogicTickNanos = System.nanoTime();
         timer = new Timer(TICK_MILLIS, event -> tick());
         timer.setCoalesce(true);
+        renderTimer = new Timer(16, event -> renderFrame());
+        renderTimer.setCoalesce(true);
     }
 
     public void start() {
         timer.start();
+        renderTimer.start();
     }
 
     public void stop() {
         timer.stop();
+        renderTimer.stop();
     }
 
     public void tick() {
-        animationFrame++;
         game.tick();
+        lastLogicTickNanos = System.nanoTime();
         timer.setDelay(game.tickIntervalMillis());
         if (game.gameOver()) {
-            timer.stop();
+            stop();
         }
+    }
+
+    private void renderFrame() {
+        animationFrame++;
         repaint();
     }
 
@@ -171,9 +183,9 @@ public final class GamePanel extends JPanel {
 
     private void drawGhosts(Graphics2D canvas) {
         for (Ghost ghost : game.ghosts()) {
-            Position position = ghost.position();
-            int x = position.x() * CELL_SIZE + 3;
-            int y = HUD_HEIGHT + position.y() * CELL_SIZE + 3;
+            Point2D.Double position = interpolatedPosition(ghost.previousPosition(), ghost.position());
+            int x = (int) Math.round(position.x * CELL_SIZE) + 3;
+            int y = HUD_HEIGHT + (int) Math.round(position.y * CELL_SIZE) + 3;
             int size = CELL_SIZE - 6;
             if (ghost.mode() == GhostMode.EATEN) {
                 drawGhostEyes(canvas, x, y, size, true);
@@ -262,9 +274,10 @@ public final class GamePanel extends JPanel {
     }
 
     private void drawPacman(Graphics2D canvas) {
-        Position position = game.pacman().position();
-        int x = position.x() * CELL_SIZE + 2;
-        int y = HUD_HEIGHT + position.y() * CELL_SIZE + 2;
+        Point2D.Double position = interpolatedPosition(
+                game.pacman().previousPosition(), game.pacman().position());
+        int x = (int) Math.round(position.x * CELL_SIZE) + 2;
+        int y = HUD_HEIGHT + (int) Math.round(position.y * CELL_SIZE) + 2;
         int size = CELL_SIZE - 4;
         canvas.setColor(new Color(0, 0, 0, 95));
         canvas.fillOval(x + 2, y + size - 1, size - 3, 4);
@@ -281,6 +294,12 @@ public final class GamePanel extends JPanel {
         canvas.fillArc(x, y, size, size, startAngle + mouthAngle / 2, 360 - mouthAngle);
         canvas.setColor(new Color(38, 28, 12));
         canvas.fillOval(x + size * 2 / 3, y + size / 3, 2, 2);
+    }
+
+    private Point2D.Double interpolatedPosition(Position previous, Position current) {
+        double progress = (System.nanoTime() - lastLogicTickNanos)
+                / (timer.getDelay() * 1_000_000.0);
+        return SpriteInterpolation.interpolate(previous, current, progress);
     }
 
     private void drawStatus(Graphics2D canvas) {

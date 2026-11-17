@@ -8,6 +8,7 @@ public final class Ghost {
     private final GhostType type;
     private final Position spawn;
     private Position position;
+    private Position previousPosition;
     private Direction direction = Direction.STOPPED;
     private GhostMode mode = GhostMode.NORMAL;
     private int frightenedTicksRemaining;
@@ -17,6 +18,7 @@ public final class Ghost {
         this.type = Objects.requireNonNull(type);
         this.spawn = Objects.requireNonNull(spawn);
         position = spawn;
+        previousPosition = spawn;
     }
 
     public GhostType type() {
@@ -25,6 +27,10 @@ public final class Ghost {
 
     public Position position() {
         return position;
+    }
+
+    public Position previousPosition() {
+        return previousPosition;
     }
 
     public GhostMode mode() {
@@ -41,7 +47,12 @@ public final class Ghost {
 
     public void move(Direction direction, Position position) {
         this.direction = Objects.requireNonNull(direction);
+        previousPosition = this.position;
         this.position = Objects.requireNonNull(position);
+    }
+
+    public void beginTick() {
+        previousPosition = position;
     }
 
     public void frightenFor(int ticks) {
@@ -64,6 +75,7 @@ public final class Ghost {
 
     public void eat() {
         position = spawn;
+        previousPosition = spawn;
         mode = GhostMode.EATEN;
         frightenedTicksRemaining = 0;
         eatenTicksRemaining = EATEN_RETURN_TICKS;
@@ -71,6 +83,7 @@ public final class Ghost {
 
     public void reset() {
         position = spawn;
+        previousPosition = spawn;
         direction = Direction.STOPPED;
         mode = GhostMode.NORMAL;
         frightenedTicksRemaining = 0;
