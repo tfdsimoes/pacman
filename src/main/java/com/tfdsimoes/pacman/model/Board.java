@@ -40,10 +40,15 @@ public final class Board {
 
     public Tile tileAt(Position position) {
         Objects.requireNonNull(position);
-        if (!contains(position)) {
-            throw new IndexOutOfBoundsException("Position is outside the board: " + position);
+        return tileAt(position.x(), position.y());
+    }
+
+    public Tile tileAt(int x, int y) {
+        if (x < 0 || x >= width() || y < 0 || y >= height()) {
+            throw new IndexOutOfBoundsException(
+                    "Position is outside the board: Position[x=" + x + ", y=" + y + "]");
         }
-        return tiles[position.y()][position.x()];
+        return tiles[y][x];
     }
 
     public boolean contains(Position position) {
