@@ -3,6 +3,7 @@ package com.tfdsimoes.pacman.logic;
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Ghost;
 import com.tfdsimoes.pacman.model.GhostMode;
+import com.tfdsimoes.pacman.model.GhostStrategyMode;
 import com.tfdsimoes.pacman.model.GhostType;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Tile;
@@ -17,8 +18,10 @@ public final class GameSession {
     private final Board board;
     private final Pacman pacman;
     private final List<Ghost> ghosts;
+    private final GhostAi ghostAi = new GhostAi();
     private int score;
     private int lives = 3;
+    private int elapsedTicks;
 
     public GameSession(Board board, Pacman pacman) {
         this.board = Objects.requireNonNull(board);
@@ -53,6 +56,10 @@ public final class GameSession {
         return ghosts;
     }
 
+    public GhostStrategyMode ghostBehaviorMode() {
+        return GhostBehaviorSchedule.modeAt(elapsedTicks);
+    }
+
     public boolean levelComplete() {
         return board.collectibleCount() == 0;
     }
@@ -72,6 +79,20 @@ public final class GameSession {
         if (eaten == Tile.POWER_PELLET) {
             ghosts.forEach(ghost -> ghost.frightenFor(FRIGHTENED_DURATION_TICKS));
         }
+        if (resolveCollisions()) {
+            elapsedTicks++;
+            return;
+        }
+        if (board.collectibleCount() == 0) {
+            elapsedTicks++;
+            return;
+        }
+        moveGhosts();
+        resolveCollisions();
+        elapsedTicks++;
+    }
+
+    private boolean resolveCollisions() {
         for (Ghost ghost : ghosts) {
             if (!ghost.position().equals(pacman.position())) {
                 continue;
@@ -83,7 +104,22 @@ public final class GameSession {
                 lives--;
                 pacman.reset(board.pacmanSpawn());
                 ghosts.forEach(Ghost::reset);
-                break;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void moveGhosts() {
+        GhostStrategyMode behaviorMode = ghostBehaviorMode();
+        for (Ghost ghost : ghosts) {
+            if (ghost.mode() == GhostMode.EATEN) {
+                continue;
+            }
+            var direction = ghostAi.chooseDirection(board, ghost, pacman, behaviorMode, ghosts);
+            var nextPosition = board.neighbor(ghost.position(), direction);
+            if (nextPosition != null) {
+                ghost.move(direction, nextPosition);
             }
         }
     }

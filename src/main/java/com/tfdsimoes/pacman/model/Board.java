@@ -49,6 +49,23 @@ public final class Board {
                 && position.y() >= 0 && position.y() < height();
     }
 
+    public Position neighbor(Position position, Direction direction) {
+        Objects.requireNonNull(position);
+        Objects.requireNonNull(direction);
+        if (!contains(position) || tileAt(position) == Tile.WALL || direction == Direction.STOPPED) {
+            return null;
+        }
+        int nextX = position.x() + direction.dx();
+        int nextY = position.y() + direction.dy();
+        if (nextX < 0) {
+            nextX = width() - 1;
+        } else if (nextX >= width()) {
+            nextX = 0;
+        }
+        Position next = new Position(nextX, nextY);
+        return contains(next) && tileAt(next) != Tile.WALL ? next : null;
+    }
+
     public Position pacmanSpawn() {
         return pacmanSpawn;
     }

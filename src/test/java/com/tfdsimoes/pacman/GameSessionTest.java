@@ -66,13 +66,9 @@ class GameSessionTest {
 
     @Test
     void powerPelletFrightensGhostsAndEatingOneAwardsBonus() throws Exception {
-        var game = game("#######\n#PoG..#\n#######");
+        var game = game("#######\n#PoG###\n#######\n#.....#\n#######");
         game.pacman().requestDirection(Direction.RIGHT);
 
-        game.tick();
-
-        assertEquals(GhostMode.FRIGHTENED, game.ghosts().getFirst().mode());
-        game.pacman().requestDirection(Direction.RIGHT);
         game.tick();
 
         assertEquals(250, game.score());

@@ -22,4 +22,14 @@ public enum Direction {
     public int dy() {
         return dy;
     }
+
+    public Direction opposite() {
+        return switch (this) {
+            case UP -> DOWN;
+            case DOWN -> UP;
+            case LEFT -> RIGHT;
+            case RIGHT -> LEFT;
+            case STOPPED -> STOPPED;
+        };
+    }
 }

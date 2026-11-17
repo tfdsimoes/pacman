@@ -53,17 +53,6 @@ public final class Pacman {
     }
 
     private Position nextPosition(Board board, Direction movement) {
-        if (movement == Direction.STOPPED) {
-            return null;
-        }
-        int nextX = position.x() + movement.dx();
-        int nextY = position.y() + movement.dy();
-        if (nextX < 0) {
-            nextX = board.width() - 1;
-        } else if (nextX >= board.width()) {
-            nextX = 0;
-        }
-        Position next = new Position(nextX, nextY);
-        return board.contains(next) && board.tileAt(next) != Tile.WALL ? next : null;
+        return board.neighbor(position, movement);
     }
 }
