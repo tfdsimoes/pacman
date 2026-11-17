@@ -58,3 +58,5 @@ ghosts are drawn with Java2D shapes and gradients; the graphics use no external
 image assets. The static wall layer is cached between paints, while pellets
 remain dynamic so their animations and collection state update immediately.
 Rendering reuses drawing styles and sprite paths to limit per-frame allocations.
+Board rendering, HUD drawing, and keyboard input are separated from the timer-driven
+game panel to keep UI responsibilities focused.
