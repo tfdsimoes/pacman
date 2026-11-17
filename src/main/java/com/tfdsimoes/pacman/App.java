@@ -1,8 +1,11 @@
 package com.tfdsimoes.pacman;
 
 import com.tfdsimoes.pacman.logic.BoardLoader;
-import com.tfdsimoes.pacman.ui.BoardRenderer;
+import com.tfdsimoes.pacman.model.Board;
+import com.tfdsimoes.pacman.model.Pacman;
+import com.tfdsimoes.pacman.ui.GameWindow;
 import java.io.IOException;
+import javax.swing.SwingUtilities;
 
 public final class App {
 
@@ -11,7 +14,8 @@ public final class App {
 
     public static void main(String[] args) {
         try {
-            System.out.println(new BoardRenderer().render(BoardLoader.loadResource("/boards/classic.txt")));
+            Board board = BoardLoader.loadResource("/boards/classic.txt");
+            SwingUtilities.invokeLater(() -> new GameWindow(board, new Pacman(board.pacmanSpawn())).show());
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load the game board", exception);
         }
