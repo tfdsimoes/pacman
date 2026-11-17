@@ -29,7 +29,8 @@ approximately 60 frames per second, interpolating sprite movement between ticks.
 Pellets are worth 10 points and power pellets 50 points; the score updates as
 items are collected, and the level completes when no pellets remain.
 Four ghosts start in the ghost house; in human mode, touching a normal ghost
-costs a life and resets the player and ghosts to their spawn positions.
+costs a life and resets the player and ghosts to their spawn positions. A
+Pac-Man/ghost tile swap during one logic tick also counts as a collision.
 Power pellets frighten active ghosts for 70 game ticks; eating a frightened
 ghost awards 200 bonus points and sends it back to the ghost house before it
 re-enters play.
