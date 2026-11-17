@@ -1,5 +1,6 @@
 package com.tfdsimoes.pacman.ui;
 
+import com.tfdsimoes.pacman.GameConfig;
 import com.tfdsimoes.pacman.logic.GameSession;
 import com.tfdsimoes.pacman.model.Board;
 import java.awt.Color;
@@ -12,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public final class GamePanel extends JPanel {
-    private static final int TICK_MILLIS = 130;
     private static final Color FLOOR_COLOR = new Color(5, 8, 28);
 
     private final GameSession game;
@@ -35,15 +35,15 @@ public final class GamePanel extends JPanel {
         setBackground(FLOOR_COLOR);
         setFocusable(true);
         setPreferredSize(new Dimension(
-                board.width() * BoardRenderer.CELL_SIZE,
-                HudRenderer.HEIGHT + board.height() * BoardRenderer.CELL_SIZE));
+                board.width() * GameConfig.CELL_SIZE,
+                GameConfig.HUD_HEIGHT + board.height() * GameConfig.CELL_SIZE));
         if (!aiControlled) {
             GameInputHandler.install(this, game);
         }
         lastLogicTickNanos = System.nanoTime();
-        timer = new Timer(TICK_MILLIS, event -> tick());
+        timer = new Timer(GameConfig.BASE_LOGIC_TICK_MILLIS, event -> tick());
         timer.setCoalesce(true);
-        renderTimer = new Timer(16, event -> renderFrame());
+        renderTimer = new Timer(GameConfig.RENDER_FRAME_MILLIS, event -> renderFrame());
         renderTimer.setCoalesce(true);
     }
 

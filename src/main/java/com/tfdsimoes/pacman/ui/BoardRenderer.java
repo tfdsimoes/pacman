@@ -1,5 +1,6 @@
 package com.tfdsimoes.pacman.ui;
 
+import com.tfdsimoes.pacman.GameConfig;
 import com.tfdsimoes.pacman.logic.GameSession;
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Direction;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Objects;
 
 public final class BoardRenderer {
-    static final int CELL_SIZE = 26;
-    static final int HUD_HEIGHT = HudRenderer.HEIGHT;
     static final Color PACMAN_COLOR = new Color(255, 220, 0);
 
     private static final Color FLOOR_COLOR = new Color(5, 8, 28);
@@ -89,7 +88,7 @@ public final class BoardRenderer {
         if (cachedBoard != board || staticMazeLayer == null) {
             cacheStaticMazeLayer(board);
         }
-        canvas.drawImage(staticMazeLayer, 0, HUD_HEIGHT, null);
+        canvas.drawImage(staticMazeLayer, 0, GameConfig.HUD_HEIGHT, null);
         drawCollectibles(canvas, board, animationFrame);
         drawFruit(canvas, game);
         drawGhosts(canvas, game.ghosts(), animationFrame, progress);
@@ -103,7 +102,8 @@ public final class BoardRenderer {
     }
 
     private void cacheStaticMazeLayer(Board board) {
-        var image = new BufferedImage(board.width() * CELL_SIZE, board.height() * CELL_SIZE,
+        var image = new BufferedImage(board.width() * GameConfig.CELL_SIZE,
+                board.height() * GameConfig.CELL_SIZE,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D canvas = image.createGraphics();
         try {
@@ -116,14 +116,16 @@ public final class BoardRenderer {
                     if (board.tileAt(x, y) != Tile.WALL) {
                         continue;
                     }
-                    int screenX = x * CELL_SIZE;
-                    int screenY = y * CELL_SIZE;
+                    int screenX = x * GameConfig.CELL_SIZE;
+                    int screenY = y * GameConfig.CELL_SIZE;
                     canvas.setPaint(new GradientPaint(screenX, screenY, WALL_HIGHLIGHT,
-                            screenX + CELL_SIZE, screenY + CELL_SIZE, WALL_COLOR));
-                    canvas.fillRoundRect(screenX + 2, screenY + 2, CELL_SIZE - 4, CELL_SIZE - 4, 9, 9);
+                            screenX + GameConfig.CELL_SIZE, screenY + GameConfig.CELL_SIZE, WALL_COLOR));
+                    canvas.fillRoundRect(screenX + 2, screenY + 2,
+                            GameConfig.CELL_SIZE - 4, GameConfig.CELL_SIZE - 4, 9, 9);
                     canvas.setColor(WALL_OUTLINE_COLOR);
                     canvas.setStroke(WALL_STROKE);
-                    canvas.drawRoundRect(screenX + 2, screenY + 2, CELL_SIZE - 4, CELL_SIZE - 4, 9, 9);
+                    canvas.drawRoundRect(screenX + 2, screenY + 2,
+                            GameConfig.CELL_SIZE - 4, GameConfig.CELL_SIZE - 4, 9, 9);
                 }
             }
         } finally {
@@ -140,16 +142,16 @@ public final class BoardRenderer {
                 if (tile != Tile.PELLET && tile != Tile.POWER_PELLET) {
                     continue;
                 }
-                int screenX = x * CELL_SIZE;
-                int screenY = HUD_HEIGHT + y * CELL_SIZE;
+                int screenX = x * GameConfig.CELL_SIZE;
+                int screenY = GameConfig.HUD_HEIGHT + y * GameConfig.CELL_SIZE;
                 int pelletSize = tile == Tile.POWER_PELLET ? 8 + animationFrame % 3 : 4;
                 int glowSize = pelletSize + 8;
                 canvas.setColor(tile == Tile.POWER_PELLET ? POWER_PELLET_GLOW_COLOR : PELLET_GLOW_COLOR);
-                canvas.fillOval(screenX + (CELL_SIZE - glowSize) / 2,
-                        screenY + (CELL_SIZE - glowSize) / 2, glowSize, glowSize);
+                canvas.fillOval(screenX + (GameConfig.CELL_SIZE - glowSize) / 2,
+                        screenY + (GameConfig.CELL_SIZE - glowSize) / 2, glowSize, glowSize);
                 canvas.setColor(PELLET_COLOR);
-                canvas.fillOval(screenX + (CELL_SIZE - pelletSize) / 2,
-                        screenY + (CELL_SIZE - pelletSize) / 2, pelletSize, pelletSize);
+                canvas.fillOval(screenX + (GameConfig.CELL_SIZE - pelletSize) / 2,
+                        screenY + (GameConfig.CELL_SIZE - pelletSize) / 2, pelletSize, pelletSize);
             }
         }
     }
@@ -157,26 +159,26 @@ public final class BoardRenderer {
     private void drawFruit(Graphics2D canvas, GameSession game) {
         game.activeFruit().ifPresent(fruit -> {
             Position position = fruit.position();
-            int x = position.x() * CELL_SIZE;
-            int y = HUD_HEIGHT + position.y() * CELL_SIZE;
+            int x = position.x() * GameConfig.CELL_SIZE;
+            int y = GameConfig.HUD_HEIGHT + position.y() * GameConfig.CELL_SIZE;
             canvas.setColor(FRUIT_COLOR);
-            canvas.fillOval(x + 6, y + 8, CELL_SIZE - 12, CELL_SIZE - 13);
+            canvas.fillOval(x + 6, y + 8, GameConfig.CELL_SIZE - 12, GameConfig.CELL_SIZE - 13);
             canvas.setColor(FRUIT_HIGHLIGHT_COLOR);
             canvas.fillOval(x + 8, y + 10, 5, 4);
             canvas.setColor(FRUIT_LEAF_COLOR);
-            canvas.fillArc(x + CELL_SIZE / 2 - 1, y + 2, 10, 9, 25, 145);
+            canvas.fillArc(x + GameConfig.CELL_SIZE / 2 - 1, y + 2, 10, 9, 25, 145);
             canvas.setColor(FRUIT_STEM_COLOR);
             canvas.setStroke(FRUIT_STROKE);
-            canvas.drawLine(x + CELL_SIZE / 2, y + 9, x + CELL_SIZE / 2 + 3, y + 4);
+            canvas.drawLine(x + GameConfig.CELL_SIZE / 2, y + 9, x + GameConfig.CELL_SIZE / 2 + 3, y + 4);
         });
     }
 
     private void drawGhosts(Graphics2D canvas, List<Ghost> ghosts, int animationFrame, double progress) {
         for (Ghost ghost : ghosts) {
             interpolate(ghost.previousPosition(), ghost.position(), progress);
-            int x = (int) Math.round(interpolationPoint.x * CELL_SIZE) + 3;
-            int y = HUD_HEIGHT + (int) Math.round(interpolationPoint.y * CELL_SIZE) + 3;
-            int size = CELL_SIZE - 6;
+            int x = (int) Math.round(interpolationPoint.x * GameConfig.CELL_SIZE) + 3;
+            int y = GameConfig.HUD_HEIGHT + (int) Math.round(interpolationPoint.y * GameConfig.CELL_SIZE) + 3;
+            int size = GameConfig.CELL_SIZE - 6;
             if (ghost.mode() == GhostMode.EATEN) {
                 drawGhostEyes(canvas, x, y, size, true);
                 continue;
@@ -201,9 +203,9 @@ public final class BoardRenderer {
 
     private void drawPacman(Graphics2D canvas, GameSession game, int animationFrame, double progress) {
         interpolate(game.pacman().previousPosition(), game.pacman().position(), progress);
-        int x = (int) Math.round(interpolationPoint.x * CELL_SIZE) + 2;
-        int y = HUD_HEIGHT + (int) Math.round(interpolationPoint.y * CELL_SIZE) + 2;
-        int size = CELL_SIZE - 4;
+        int x = (int) Math.round(interpolationPoint.x * GameConfig.CELL_SIZE) + 2;
+        int y = GameConfig.HUD_HEIGHT + (int) Math.round(interpolationPoint.y * GameConfig.CELL_SIZE) + 2;
+        int size = GameConfig.CELL_SIZE - 4;
         canvas.setColor(PACMAN_SHADOW_COLOR);
         canvas.fillOval(x + 2, y + size - 1, size - 3, 4);
         canvas.setColor(PACMAN_GLOW_COLOR);
@@ -263,7 +265,7 @@ public final class BoardRenderer {
     }
 
     private static Path2D.Double createGhostShape() {
-        int size = CELL_SIZE - 6;
+        int size = GameConfig.CELL_SIZE - 6;
         double bottom = size;
         Path2D.Double body = new Path2D.Double();
         body.moveTo(0, bottom);
@@ -282,7 +284,7 @@ public final class BoardRenderer {
     }
 
     private static Path2D.Double createFrightenedMouth() {
-        int size = CELL_SIZE - 6;
+        int size = GameConfig.CELL_SIZE - 6;
         Path2D.Double mouth = new Path2D.Double();
         mouth.moveTo(size / 4.0, size * 0.72);
         for (int point = 1; point <= 4; point++) {

@@ -1,5 +1,6 @@
 package com.tfdsimoes.pacman.logic;
 
+import com.tfdsimoes.pacman.GameConfig;
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Fruit;
 import com.tfdsimoes.pacman.model.Position;
@@ -7,13 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class FruitManager {
-    private static final long FIRST_SPAWN_TICK = 60;
-    private static final long SPAWN_INTERVAL_TICKS = 120;
-    private static final int FRUIT_LIFETIME_TICKS = 70;
-    private static final int BASE_FRUIT_VALUE = 100;
-
     private long elapsedTicks;
-    private long nextSpawnTick = FIRST_SPAWN_TICK;
+    private long nextSpawnTick = GameConfig.FIRST_FRUIT_SPAWN_TICK;
     private Fruit fruit;
 
     public Optional<Fruit> activeFruit() {
@@ -32,8 +28,8 @@ public final class FruitManager {
         if (fruit == null && elapsedTicks >= nextSpawnTick) {
             Position center = new Position(board.width() / 2, board.height() / 2);
             fruit = new Fruit(board.nearestOpenPosition(center),
-                    Math.multiplyExact(BASE_FRUIT_VALUE, level), FRUIT_LIFETIME_TICKS);
-            nextSpawnTick += SPAWN_INTERVAL_TICKS;
+                    Math.multiplyExact(GameConfig.FRUIT_BASE_VALUE, level), GameConfig.FRUIT_LIFETIME_TICKS);
+            nextSpawnTick += GameConfig.FRUIT_SPAWN_INTERVAL_TICKS;
         }
     }
 
@@ -49,7 +45,7 @@ public final class FruitManager {
 
     public void reset() {
         elapsedTicks = 0;
-        nextSpawnTick = FIRST_SPAWN_TICK;
+        nextSpawnTick = GameConfig.FIRST_FRUIT_SPAWN_TICK;
         fruit = null;
     }
 }
