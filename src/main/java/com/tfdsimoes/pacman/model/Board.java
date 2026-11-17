@@ -69,6 +69,15 @@ public final class Board {
         return count;
     }
 
+    public Tile consumeCollectible(Position position) {
+        Tile tile = tileAt(position);
+        if (tile == Tile.PELLET || tile == Tile.POWER_PELLET) {
+            tiles[position.y()][position.x()] = Tile.EMPTY;
+            return tile;
+        }
+        return Tile.EMPTY;
+    }
+
     private static Tile[][] copyTiles(Tile[][] source) {
         Objects.requireNonNull(source);
         Tile[][] copy = new Tile[source.length][];

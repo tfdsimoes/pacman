@@ -22,6 +22,8 @@ is in `src/main/resources/boards/classic.txt`.
 
 Use the arrow keys or WASD to move. Movement uses grid ticks with buffered turns,
 wall collision, and horizontal wrap-around at the open tunnel endpoints.
+Pellets are worth 10 points and power pellets 50 points; the score updates as
+items are collected, and the level completes when no pellets remain.
 
 ## Board layout
 

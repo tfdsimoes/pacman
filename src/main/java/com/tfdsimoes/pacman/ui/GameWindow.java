@@ -1,7 +1,6 @@
 package com.tfdsimoes.pacman.ui;
 
-import com.tfdsimoes.pacman.model.Board;
-import com.tfdsimoes.pacman.model.Pacman;
+import com.tfdsimoes.pacman.logic.GameSession;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
@@ -11,8 +10,8 @@ public final class GameWindow {
     private final JFrame frame;
     private final GamePanel gamePanel;
 
-    public GameWindow(Board board, Pacman pacman) {
-        gamePanel = new GamePanel(Objects.requireNonNull(board), Objects.requireNonNull(pacman));
+    public GameWindow(GameSession game) {
+        gamePanel = new GamePanel(Objects.requireNonNull(game));
         frame = new JFrame("Pac-Man");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
