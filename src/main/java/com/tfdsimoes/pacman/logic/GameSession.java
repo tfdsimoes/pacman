@@ -151,7 +151,7 @@ public final class GameSession {
 
     private boolean resolveCollisions() {
         for (Ghost ghost : ghosts) {
-            if (!ghost.position().equals(pacman.position())) {
+            if (!isCollision(pacman, ghost)) {
                 continue;
             }
             if (ghost.mode() == GhostMode.FRIGHTENED) {
@@ -165,6 +165,12 @@ public final class GameSession {
             }
         }
         return false;
+    }
+
+    static boolean isCollision(Pacman pacman, Ghost ghost) {
+        return ghost.position().equals(pacman.position())
+                || (ghost.previousPosition().equals(pacman.position())
+                        && ghost.position().equals(pacman.previousPosition()));
     }
 
     private void moveGhosts() {
