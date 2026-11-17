@@ -17,12 +17,11 @@ mvn package
 java -jar target/pacman-1.0-SNAPSHOT.jar
 ```
 
-The application currently loads and prints the maze in the terminal. The game is
-being implemented in stages; the board layout is in
-`src/main/resources/boards/classic.txt`.
+The application opens a Swing window with the maze and Pac-Man. The board layout
+is in `src/main/resources/boards/classic.txt`.
 
-Pac-Man movement is modeled in grid ticks with buffered turns, wall collision,
-and horizontal wrap-around at open tunnel endpoints.
+Use the arrow keys or WASD to move. Movement uses grid ticks with buffered turns,
+wall collision, and horizontal wrap-around at the open tunnel endpoints.
 
 ## Board layout
 
