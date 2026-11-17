@@ -19,6 +19,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -43,6 +44,7 @@ public final class GamePanel extends JPanel {
     private final boolean aiControlled;
     private int animationFrame;
     private long lastLogicTickNanos;
+    private BufferedImage staticMazeLayer;
 
     public GamePanel(GameSession game) {
         this(game, false);
@@ -55,6 +57,7 @@ public final class GamePanel extends JPanel {
         setBackground(FLOOR_COLOR);
         setFocusable(true);
         setPreferredSize(new Dimension(board.width() * CELL_SIZE, HUD_HEIGHT + board.height() * CELL_SIZE));
+        staticMazeLayer = createStaticMazeLayer();
         if (!aiControlled) {
             configureKeyBindings();
         }
@@ -76,8 +79,12 @@ public final class GamePanel extends JPanel {
     }
 
     public void tick() {
+        int previousLevel = game.level();
         game.tick();
         lastLogicTickNanos = System.nanoTime();
+        if (game.level() != previousLevel) {
+            staticMazeLayer = createStaticMazeLayer();
+        }
         timer.setDelay(game.tickIntervalMillis());
         if (game.gameOver()) {
             stop();
@@ -153,32 +160,56 @@ public final class GamePanel extends JPanel {
 
     private void drawBoard(Graphics2D canvas) {
         Board board = game.board();
-        canvas.setColor(FLOOR_COLOR);
-        canvas.fillRect(0, HUD_HEIGHT, board.width() * CELL_SIZE, board.height() * CELL_SIZE);
+        canvas.drawImage(staticMazeLayer, 0, HUD_HEIGHT, null);
         for (int y = 0; y < board.height(); y++) {
             for (int x = 0; x < board.width(); x++) {
+                Tile tile = board.tileAt(new Position(x, y));
+                if (tile != Tile.PELLET && tile != Tile.POWER_PELLET) {
+                    continue;
+                }
                 int screenX = x * CELL_SIZE;
                 int screenY = HUD_HEIGHT + y * CELL_SIZE;
-                Tile tile = board.tileAt(new Position(x, y));
-                if (tile == Tile.WALL) {
+                int pelletSize = tile == Tile.POWER_PELLET ? 8 + animationFrame % 3 : 4;
+                int glowSize = pelletSize + 8;
+                canvas.setColor(new Color(255, 208, 150, tile == Tile.POWER_PELLET ? 55 : 24));
+                canvas.fillOval(screenX + (CELL_SIZE - glowSize) / 2,
+                        screenY + (CELL_SIZE - glowSize) / 2, glowSize, glowSize);
+                canvas.setColor(PELLET_COLOR);
+                canvas.fillOval(screenX + (CELL_SIZE - pelletSize) / 2,
+                        screenY + (CELL_SIZE - pelletSize) / 2, pelletSize, pelletSize);
+            }
+        }
+    }
+
+    private BufferedImage createStaticMazeLayer() {
+        Board board = game.board();
+        var image = new BufferedImage(board.width() * CELL_SIZE, board.height() * CELL_SIZE,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D canvas = image.createGraphics();
+        try {
+            canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            canvas.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            canvas.setColor(FLOOR_COLOR);
+            canvas.fillRect(0, 0, image.getWidth(), image.getHeight());
+            for (int y = 0; y < board.height(); y++) {
+                for (int x = 0; x < board.width(); x++) {
+                    if (board.tileAt(new Position(x, y)) != Tile.WALL) {
+                        continue;
+                    }
+                    int screenX = x * CELL_SIZE;
+                    int screenY = y * CELL_SIZE;
                     canvas.setPaint(new GradientPaint(screenX, screenY, WALL_HIGHLIGHT,
                             screenX + CELL_SIZE, screenY + CELL_SIZE, WALL_COLOR));
                     canvas.fillRoundRect(screenX + 2, screenY + 2, CELL_SIZE - 4, CELL_SIZE - 4, 9, 9);
                     canvas.setColor(new Color(103, 176, 255, 210));
                     canvas.setStroke(new BasicStroke(1.2f));
                     canvas.drawRoundRect(screenX + 2, screenY + 2, CELL_SIZE - 4, CELL_SIZE - 4, 9, 9);
-                } else if (tile == Tile.PELLET || tile == Tile.POWER_PELLET) {
-                    int pelletSize = tile == Tile.POWER_PELLET ? 8 + animationFrame % 3 : 4;
-                    int glowSize = pelletSize + 8;
-                    canvas.setColor(new Color(255, 208, 150, tile == Tile.POWER_PELLET ? 55 : 24));
-                    canvas.fillOval(screenX + (CELL_SIZE - glowSize) / 2,
-                            screenY + (CELL_SIZE - glowSize) / 2, glowSize, glowSize);
-                    canvas.setColor(PELLET_COLOR);
-                    canvas.fillOval(screenX + (CELL_SIZE - pelletSize) / 2,
-                            screenY + (CELL_SIZE - pelletSize) / 2, pelletSize, pelletSize);
                 }
             }
+        } finally {
+            canvas.dispose();
         }
+        return image;
     }
 
     private void drawGhosts(Graphics2D canvas) {
