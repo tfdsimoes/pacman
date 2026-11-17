@@ -14,6 +14,10 @@ import java.util.Objects;
 public final class GameSession {
     private static final int FRIGHTENED_DURATION_TICKS = 70;
     private static final int GHOST_EAT_SCORE = 200;
+    private static final int LEVEL_CLEAR_TICKS = 10;
+    private static final int BASE_TICK_MILLIS = 130;
+    private static final int LEVEL_SPEEDUP_MILLIS = 8;
+    private static final int MIN_TICK_MILLIS = 60;
 
     private final Board board;
     private final Pacman pacman;
@@ -21,6 +25,8 @@ public final class GameSession {
     private final GhostAi ghostAi = new GhostAi();
     private int score;
     private int lives = 3;
+    private int level = 1;
+    private int levelClearTicksRemaining;
     private int elapsedTicks;
 
     public GameSession(Board board, Pacman pacman) {
@@ -52,6 +58,19 @@ public final class GameSession {
         return lives;
     }
 
+    public int level() {
+        return level;
+    }
+
+    public boolean gameOver() {
+        return lives == 0;
+    }
+
+    public int tickIntervalMillis() {
+        return (int) Math.max(MIN_TICK_MILLIS,
+                BASE_TICK_MILLIS - (long) (level - 1) * LEVEL_SPEEDUP_MILLIS);
+    }
+
     public List<Ghost> ghosts() {
         return ghosts;
     }
@@ -65,7 +84,13 @@ public final class GameSession {
     }
 
     public void tick() {
-        if (levelComplete() || lives == 0) {
+        if (gameOver()) {
+            return;
+        }
+        if (levelComplete()) {
+            if (levelClearTicksRemaining > 0 && --levelClearTicksRemaining == 0) {
+                advanceLevel();
+            }
             return;
         }
         ghosts.forEach(Ghost::advanceModeTick);
@@ -79,17 +104,29 @@ public final class GameSession {
         if (eaten == Tile.POWER_PELLET) {
             ghosts.forEach(ghost -> ghost.frightenFor(FRIGHTENED_DURATION_TICKS));
         }
+        boolean levelCleared = levelComplete();
+        if (levelCleared) {
+            levelClearTicksRemaining = LEVEL_CLEAR_TICKS;
+        }
         if (resolveCollisions()) {
             elapsedTicks++;
             return;
         }
-        if (board.collectibleCount() == 0) {
+        if (levelCleared) {
             elapsedTicks++;
             return;
         }
         moveGhosts();
         resolveCollisions();
         elapsedTicks++;
+    }
+
+    private void advanceLevel() {
+        level++;
+        board.reset();
+        pacman.reset(board.pacmanSpawn());
+        ghosts.forEach(Ghost::reset);
+        elapsedTicks = 0;
     }
 
     private boolean resolveCollisions() {

@@ -32,6 +32,9 @@ re-enters play.
 Ghosts now move through the maze with deterministic shortest-path pursuit and
 per-ghost target behaviors. They alternate scatter and chase phases before
 remaining in chase mode.
+The game starts with three lives. Clearing the maze advances to a reset board
+after a brief level-clear display, with movement speeding up by level; losing
+all lives ends the game.
 
 ## Board layout
 
