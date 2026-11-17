@@ -2,9 +2,9 @@ package com.tfdsimoes.pacman.ui;
 
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Direction;
-import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
 import com.tfdsimoes.pacman.model.Tile;
+import com.tfdsimoes.pacman.logic.GameSession;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -27,13 +27,12 @@ public final class GamePanel extends JPanel {
     private static final Color PELLET_COLOR = new Color(255, 190, 170);
     private static final Color PACMAN_COLOR = new Color(255, 220, 0);
 
-    private final Board board;
-    private final Pacman pacman;
+    private final GameSession game;
     private final Timer timer;
 
-    public GamePanel(Board board, Pacman pacman) {
-        this.board = Objects.requireNonNull(board);
-        this.pacman = Objects.requireNonNull(pacman);
+    public GamePanel(GameSession game) {
+        this.game = Objects.requireNonNull(game);
+        Board board = game.board();
         setBackground(Color.BLACK);
         setFocusable(true);
         setPreferredSize(new Dimension(board.width() * CELL_SIZE, HUD_HEIGHT + board.height() * CELL_SIZE));
@@ -51,7 +50,7 @@ public final class GamePanel extends JPanel {
     }
 
     public void tick() {
-        pacman.tick(board);
+        game.tick();
         repaint();
     }
 
@@ -85,7 +84,7 @@ public final class GamePanel extends JPanel {
         actionMap.put(actionName, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                pacman.requestDirection(direction);
+                game.pacman().requestDirection(direction);
             }
         });
     }
@@ -95,10 +94,11 @@ public final class GamePanel extends JPanel {
         canvas.fillRect(0, 0, getWidth(), HUD_HEIGHT);
         canvas.setColor(Color.WHITE);
         canvas.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
-        canvas.drawString("SCORE 0       LIVES 3       LEVEL 1", 10, 23);
+        canvas.drawString("SCORE " + game.score() + "       LIVES 3       LEVEL 1", 10, 23);
     }
 
     private void drawBoard(Graphics2D canvas) {
+        Board board = game.board();
         for (int y = 0; y < board.height(); y++) {
             for (int x = 0; x < board.width(); x++) {
                 int screenX = x * CELL_SIZE;
@@ -118,7 +118,7 @@ public final class GamePanel extends JPanel {
     }
 
     private void drawPacman(Graphics2D canvas) {
-        Position position = pacman.position();
+        Position position = game.pacman().position();
         canvas.setColor(PACMAN_COLOR);
         canvas.fillOval(position.x() * CELL_SIZE + 2, HUD_HEIGHT + position.y() * CELL_SIZE + 2,
                 CELL_SIZE - 4, CELL_SIZE - 4);

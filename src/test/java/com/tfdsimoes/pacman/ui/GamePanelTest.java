@@ -3,6 +3,7 @@ package com.tfdsimoes.pacman.ui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.tfdsimoes.pacman.logic.BoardLoader;
+import com.tfdsimoes.pacman.logic.GameSession;
 import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
@@ -17,7 +18,8 @@ class GamePanelTest {
     void arrowKeyRequestsMovementAndTickMovesPlayer() throws Exception {
         var board = BoardLoader.loadResource("/boards/classic.txt");
         var pacman = new Pacman(board.pacmanSpawn());
-        var panel = new GamePanel(board, pacman);
+        var game = new GameSession(board, pacman);
+        var panel = new GamePanel(game);
         KeyStroke up = KeyStroke.getKeyStroke("UP");
         Object actionName = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(up);
         Action action = panel.getActionMap().get(actionName);
@@ -27,6 +29,7 @@ class GamePanelTest {
 
         assertEquals(Direction.UP, pacman.direction());
         assertEquals(new Position(8, 6), pacman.position());
+        assertEquals(10, game.score());
         assertEquals(19 * 28, panel.getPreferredSize().width);
     }
 }
