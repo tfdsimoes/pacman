@@ -19,6 +19,12 @@ public final class Pacman {
         return direction;
     }
 
+    public void reset(Position position) {
+        this.position = Objects.requireNonNull(position);
+        direction = Direction.STOPPED;
+        requestedDirection = Direction.STOPPED;
+    }
+
     public void requestDirection(Direction direction) {
         requestedDirection = Objects.requireNonNull(direction);
     }

@@ -2,6 +2,8 @@ package com.tfdsimoes.pacman.ui;
 
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Direction;
+import com.tfdsimoes.pacman.model.Ghost;
+import com.tfdsimoes.pacman.model.GhostType;
 import com.tfdsimoes.pacman.model.Position;
 import com.tfdsimoes.pacman.model.Tile;
 import com.tfdsimoes.pacman.logic.GameSession;
@@ -61,6 +63,7 @@ public final class GamePanel extends JPanel {
         try {
             drawHud(canvas);
             drawBoard(canvas);
+            drawGhosts(canvas);
             drawPacman(canvas);
         } finally {
             canvas.dispose();
@@ -94,7 +97,7 @@ public final class GamePanel extends JPanel {
         canvas.fillRect(0, 0, getWidth(), HUD_HEIGHT);
         canvas.setColor(Color.WHITE);
         canvas.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
-        canvas.drawString("SCORE " + game.score() + "       LIVES 3       LEVEL 1", 10, 23);
+        canvas.drawString("SCORE " + game.score() + "       LIVES " + game.lives() + "       LEVEL 1", 10, 23);
     }
 
     private void drawBoard(Graphics2D canvas) {
@@ -117,10 +120,28 @@ public final class GamePanel extends JPanel {
         }
     }
 
+    private void drawGhosts(Graphics2D canvas) {
+        for (Ghost ghost : game.ghosts()) {
+            Position position = ghost.position();
+            canvas.setColor(ghostColor(ghost.type()));
+            canvas.fillRoundRect(position.x() * CELL_SIZE + 3, HUD_HEIGHT + position.y() * CELL_SIZE + 3,
+                    CELL_SIZE - 6, CELL_SIZE - 6, 12, 12);
+        }
+    }
+
     private void drawPacman(Graphics2D canvas) {
         Position position = game.pacman().position();
         canvas.setColor(PACMAN_COLOR);
         canvas.fillOval(position.x() * CELL_SIZE + 2, HUD_HEIGHT + position.y() * CELL_SIZE + 2,
                 CELL_SIZE - 4, CELL_SIZE - 4);
+    }
+
+    private Color ghostColor(GhostType type) {
+        return switch (type) {
+            case BLINKY -> new Color(255, 40, 40);
+            case PINKY -> new Color(255, 150, 200);
+            case INKY -> new Color(70, 220, 230);
+            case CLYDE -> new Color(255, 170, 70);
+        };
     }
 }
