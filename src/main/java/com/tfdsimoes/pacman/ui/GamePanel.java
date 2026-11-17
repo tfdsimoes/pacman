@@ -3,6 +3,7 @@ package com.tfdsimoes.pacman.ui;
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Ghost;
+import com.tfdsimoes.pacman.model.GhostMode;
 import com.tfdsimoes.pacman.model.GhostType;
 import com.tfdsimoes.pacman.model.Position;
 import com.tfdsimoes.pacman.model.Tile;
@@ -123,7 +124,7 @@ public final class GamePanel extends JPanel {
     private void drawGhosts(Graphics2D canvas) {
         for (Ghost ghost : game.ghosts()) {
             Position position = ghost.position();
-            canvas.setColor(ghostColor(ghost.type()));
+            canvas.setColor(ghostColor(ghost));
             canvas.fillRoundRect(position.x() * CELL_SIZE + 3, HUD_HEIGHT + position.y() * CELL_SIZE + 3,
                     CELL_SIZE - 6, CELL_SIZE - 6, 12, 12);
         }
@@ -136,8 +137,14 @@ public final class GamePanel extends JPanel {
                 CELL_SIZE - 4, CELL_SIZE - 4);
     }
 
-    private Color ghostColor(GhostType type) {
-        return switch (type) {
+    private Color ghostColor(Ghost ghost) {
+        if (ghost.mode() == GhostMode.FRIGHTENED) {
+            return new Color(45, 70, 210);
+        }
+        if (ghost.mode() == GhostMode.EATEN) {
+            return Color.WHITE;
+        }
+        return switch (ghost.type()) {
             case BLINKY -> new Color(255, 40, 40);
             case PINKY -> new Color(255, 150, 200);
             case INKY -> new Color(70, 220, 230);

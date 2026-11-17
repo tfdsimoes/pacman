@@ -26,6 +26,9 @@ Pellets are worth 10 points and power pellets 50 points; the score updates as
 items are collected, and the level completes when no pellets remain.
 Four stationary ghosts occupy the ghost house; touching one costs a life and
 resets the player and ghosts to their spawn positions.
+Power pellets frighten active ghosts for 70 game ticks; eating a frightened
+ghost awards 200 bonus points and sends it back to the ghost house before it
+re-enters play.
 
 ## Board layout
 

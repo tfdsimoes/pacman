@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.tfdsimoes.pacman.logic.BoardLoader;
 import com.tfdsimoes.pacman.logic.GameSession;
 import com.tfdsimoes.pacman.model.Direction;
+import com.tfdsimoes.pacman.model.GhostMode;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
 import com.tfdsimoes.pacman.model.Tile;
@@ -61,6 +62,46 @@ class GameSessionTest {
 
         assertEquals(clearedPosition, game.pacman().position());
         assertEquals(10, game.score());
+    }
+
+    @Test
+    void powerPelletFrightensGhostsAndEatingOneAwardsBonus() throws Exception {
+        var game = game("#######\n#PoG..#\n#######");
+        game.pacman().requestDirection(Direction.RIGHT);
+
+        game.tick();
+
+        assertEquals(GhostMode.FRIGHTENED, game.ghosts().getFirst().mode());
+        game.pacman().requestDirection(Direction.RIGHT);
+        game.tick();
+
+        assertEquals(250, game.score());
+        assertEquals(3, game.lives());
+        assertEquals(GhostMode.EATEN, game.ghosts().getFirst().mode());
+        assertEquals(game.board().ghostSpawns().getFirst(), game.ghosts().getFirst().position());
+        game.pacman().requestDirection(Direction.LEFT);
+        game.tick();
+        game.pacman().requestDirection(Direction.STOPPED);
+
+        for (int tick = 0; tick < 9; tick++) {
+            game.tick();
+        }
+
+        assertEquals(GhostMode.NORMAL, game.ghosts().getFirst().mode());
+    }
+
+    @Test
+    void frightenedModeExpiresAfterItsTickDuration() throws Exception {
+        var game = game("######\n#PoG.#\n######");
+        game.pacman().requestDirection(Direction.RIGHT);
+        game.tick();
+        game.pacman().requestDirection(Direction.STOPPED);
+
+        for (int tick = 0; tick < 70; tick++) {
+            game.tick();
+        }
+
+        assertEquals(GhostMode.NORMAL, game.ghosts().getFirst().mode());
     }
 
     private static GameSession game(String layout) throws Exception {
