@@ -17,16 +17,17 @@ mvn package
 java -jar target/pacman-1.0-SNAPSHOT.jar
 ```
 
-The application opens a Swing window with an expanded 29-by-21 maze and a
+The application opens a Swing menu where you can choose to play yourself or
+watch the autonomous Pac-Man AI. Both modes use the expanded 29-by-21 maze and
 refreshed, antialiased arcade-style presentation. The board layout is in
 `src/main/resources/boards/classic.txt`.
 
-Use the arrow keys or WASD to move. Movement uses grid ticks with buffered turns,
-wall collision, and horizontal wrap-around at the open tunnel endpoints.
+In human mode, use the arrow keys or WASD to move. Movement uses grid ticks with
+buffered turns, wall collision, and horizontal wrap-around at the open tunnel endpoints.
 Pellets are worth 10 points and power pellets 50 points; the score updates as
 items are collected, and the level completes when no pellets remain.
-Four stationary ghosts occupy the ghost house; touching one costs a life and
-resets the player and ghosts to their spawn positions.
+Four ghosts start in the ghost house; in human mode, touching a normal ghost
+costs a life and resets the player and ghosts to their spawn positions.
 Power pellets frighten active ghosts for 70 game ticks; eating a frightened
 ghost awards 200 bonus points and sends it back to the ghost house before it
 re-enters play.
@@ -38,6 +39,11 @@ after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.
 Bonus fruit appears on a timer, remains available for a limited duration, and
 awards 100 points per level when Pac-Man reaches its location.
+The AI mode autonomously routes to the nearest remaining collectible and
+prioritizes power pellets when normal ghosts are nearby. To ensure the autoplay
+demonstration can finish the maze, it defeats normal ghosts on contact without
+losing a life; human mode keeps the standard collision rules. Its board-clearing
+behavior is tested against the classic maze and the real ghost logic.
 
 ## Board layout
 

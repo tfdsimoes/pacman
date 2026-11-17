@@ -1,9 +1,12 @@
 package com.tfdsimoes.pacman.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.tfdsimoes.pacman.logic.BoardLoader;
 import com.tfdsimoes.pacman.logic.GameSession;
+import com.tfdsimoes.pacman.logic.PacmanAi;
 import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
@@ -51,5 +54,18 @@ class GamePanelTest {
 
         assertEquals(29 * 26, preferredSize.width);
         assertEquals(48 + 21 * 26, preferredSize.height);
+    }
+
+    @Test
+    void aiModeDoesNotRegisterHumanMovementKeys() throws Exception {
+        var board = BoardLoader.loadResource("/boards/classic.txt");
+        var game = new GameSession(board, new Pacman(board.pacmanSpawn()), new PacmanAi());
+        var panel = new GamePanel(game, true);
+
+        assertNull(panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .get(KeyStroke.getKeyStroke("UP")));
+        panel.tick();
+
+        assertNotEquals(board.pacmanSpawn(), game.pacman().position());
     }
 }

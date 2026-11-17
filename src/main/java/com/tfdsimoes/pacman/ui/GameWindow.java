@@ -11,8 +11,12 @@ public final class GameWindow {
     private final GamePanel gamePanel;
 
     public GameWindow(GameSession game) {
-        gamePanel = new GamePanel(Objects.requireNonNull(game));
-        frame = new JFrame("Pac-Man");
+        this(game, false);
+    }
+
+    public GameWindow(GameSession game, boolean aiControlled) {
+        gamePanel = new GamePanel(Objects.requireNonNull(game), aiControlled);
+        frame = new JFrame(aiControlled ? "Pac-Man - AI Mode" : "Pac-Man");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.add(gamePanel);
