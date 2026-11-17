@@ -18,17 +18,17 @@ import org.junit.jupiter.api.Test;
 
 class BoardLoaderTest {
     @Test
-    void loadsDimensionsTilesAndSpawnPoints() throws Exception {
+    void loadsLargerDimensionsTilesAndSpawnPoints() throws Exception {
         var board = BoardLoader.loadResource("/boards/classic.txt");
 
-        assertEquals(19, board.width());
-        assertEquals(15, board.height());
-        assertEquals(new Position(8, 7), board.pacmanSpawn());
+        assertEquals(29, board.width());
+        assertEquals(21, board.height());
+        assertEquals(new Position(14, 17), board.pacmanSpawn());
         assertEquals(java.util.List.of(
-                new Position(6, 8), new Position(7, 8), new Position(8, 8), new Position(9, 8)),
+                new Position(12, 9), new Position(13, 9), new Position(14, 9), new Position(15, 9)),
                 board.ghostSpawns());
         assertEquals(Tile.WALL, board.tileAt(new Position(0, 0)));
-        assertEquals(Tile.POWER_PELLET, board.tileAt(new Position(1, 11)));
+        assertEquals(Tile.POWER_PELLET, board.tileAt(new Position(1, 1)));
         assertEquals(Tile.EMPTY, board.tileAt(board.pacmanSpawn()));
     }
 
@@ -48,7 +48,7 @@ class BoardLoaderTest {
     }
 
     @Test
-    void classicSpawnHasAnOpenNeighbor() throws Exception {
+    void pacmanSpawnHasAnOpenNeighbor() throws Exception {
         var board = BoardLoader.loadResource("/boards/classic.txt");
         Position spawn = board.pacmanSpawn();
 
@@ -62,7 +62,7 @@ class BoardLoaderTest {
     }
 
     @Test
-    void everyClassicCollectibleIsReachableFromPacmanSpawn() throws Exception {
+    void everyCollectibleIsReachableFromPacmanSpawn() throws Exception {
         var board = BoardLoader.loadResource("/boards/classic.txt");
         Set<Position> reachable = new HashSet<>();
         var pending = new ArrayDeque<Position>();

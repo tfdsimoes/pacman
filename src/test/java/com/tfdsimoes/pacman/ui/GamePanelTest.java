@@ -8,6 +8,7 @@ import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -28,8 +29,27 @@ class GamePanelTest {
         panel.tick();
 
         assertEquals(Direction.UP, pacman.direction());
-        assertEquals(new Position(8, 6), pacman.position());
+        assertEquals(new Position(14, 16), pacman.position());
         assertEquals(10, game.score());
-        assertEquals(19 * 28, panel.getPreferredSize().width);
+        assertEquals(29 * 26, panel.getPreferredSize().width);
+    }
+
+    @Test
+    void paintsTheExpandedBoard() throws Exception {
+        var board = BoardLoader.loadResource("/boards/classic.txt");
+        var panel = new GamePanel(new GameSession(board, new Pacman(board.pacmanSpawn())));
+        var preferredSize = panel.getPreferredSize();
+        var image = new BufferedImage(preferredSize.width, preferredSize.height, BufferedImage.TYPE_INT_ARGB);
+        panel.setSize(preferredSize);
+
+        var graphics = image.createGraphics();
+        try {
+            panel.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
+
+        assertEquals(29 * 26, preferredSize.width);
+        assertEquals(48 + 21 * 26, preferredSize.height);
     }
 }
