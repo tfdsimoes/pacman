@@ -142,6 +142,26 @@ class GameSessionTest {
         assertEquals(0, game.lives());
     }
 
+    @Test
+    void collectingTimedFruitAddsBonusToSessionScore() throws Exception {
+        var game = game(String.join("\n",
+                "#########",
+                "#G#####P#",
+                "#########",
+                "#.......#",
+                "#########"));
+        for (int tick = 0; tick < 60; tick++) {
+            game.tick();
+        }
+        Position fruitPosition = game.activeFruit().orElseThrow().position();
+        game.pacman().reset(fruitPosition);
+
+        game.tick();
+
+        assertEquals(110, game.score());
+        assertTrue(game.activeFruit().isEmpty());
+    }
+
     private static GameSession game(String layout) throws Exception {
         var board = BoardLoader.load(new ByteArrayInputStream(layout.getBytes(StandardCharsets.UTF_8)));
         return new GameSession(board, new Pacman(board.pacmanSpawn()));

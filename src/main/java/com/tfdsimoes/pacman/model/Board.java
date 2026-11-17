@@ -68,6 +68,30 @@ public final class Board {
         return contains(next) && tileAt(next) != Tile.WALL ? next : null;
     }
 
+    public Position nearestOpenPosition(Position target) {
+        Objects.requireNonNull(target);
+        Position nearest = null;
+        long bestDistance = Long.MAX_VALUE;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                Position candidate = new Position(x, y);
+                if (tileAt(candidate) == Tile.WALL) {
+                    continue;
+                }
+                long distance = Math.abs((long) candidate.x() - target.x())
+                        + Math.abs((long) candidate.y() - target.y());
+                if (distance < bestDistance) {
+                    nearest = candidate;
+                    bestDistance = distance;
+                }
+            }
+        }
+        if (nearest == null) {
+            throw new IllegalStateException("Board does not contain any open tiles");
+        }
+        return nearest;
+    }
+
     public Position pacmanSpawn() {
         return pacmanSpawn;
     }
