@@ -156,9 +156,6 @@ public final class GameSession {
             if (ghost.mode() == GhostMode.FRIGHTENED) {
                 score += GHOST_EAT_SCORE;
                 ghost.eat();
-            } else if (pacmanController != null && ghost.mode() == GhostMode.NORMAL) {
-                score += GHOST_EAT_SCORE;
-                ghost.eat();
             } else if (ghost.mode() == GhostMode.NORMAL) {
                 lives--;
                 pacman.reset(board.pacmanSpawn());

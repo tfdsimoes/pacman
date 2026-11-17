@@ -144,21 +144,17 @@ class GameSessionTest {
     }
 
     @Test
-    void aiModeDefeatsNormalGhostsWithoutLosingLives() throws Exception {
+    void aiModeLosesALifeWhenItTouchesANormalGhost() throws Exception {
         var board = BoardLoader.load(new ByteArrayInputStream(
                 "#####\n#PG.#\n#####".getBytes(StandardCharsets.UTF_8)));
         var game = new GameSession(board, new Pacman(board.pacmanSpawn()), new PacmanAi());
 
         game.tick();
 
-        assertEquals(3, game.lives());
-        assertEquals(200, game.score());
-        assertEquals(GhostMode.EATEN, game.ghosts().getFirst().mode());
-
-        game.tick();
-
-        assertTrue(game.levelComplete());
-        assertEquals(210, game.score());
+        assertEquals(2, game.lives());
+        assertEquals(0, game.score());
+        assertEquals(board.pacmanSpawn(), game.pacman().position());
+        assertEquals(GhostMode.NORMAL, game.ghosts().getFirst().mode());
     }
 
     @Test
