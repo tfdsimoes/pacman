@@ -20,7 +20,9 @@ class BoardLoaderTest {
         assertEquals(19, board.width());
         assertEquals(15, board.height());
         assertEquals(new Position(8, 7), board.pacmanSpawn());
-        assertEquals(java.util.List.of(new Position(9, 8)), board.ghostSpawns());
+        assertEquals(java.util.List.of(
+                new Position(6, 8), new Position(7, 8), new Position(8, 8), new Position(9, 8)),
+                board.ghostSpawns());
         assertEquals(Tile.WALL, board.tileAt(new Position(0, 0)));
         assertEquals(Tile.POWER_PELLET, board.tileAt(new Position(1, 11)));
         assertEquals(Tile.EMPTY, board.tileAt(board.pacmanSpawn()));
