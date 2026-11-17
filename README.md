@@ -55,4 +55,5 @@ are treated as empty floor tiles by the board model.
 The expanded maze has four ghost spawn tiles, corner power pellets, and a
 horizontal tunnel through its center row. Wall blocks, pellets, Pac-Man, and
 ghosts are drawn with Java2D shapes and gradients; the graphics use no external
-image assets.
+image assets. The static wall layer is cached between paints, while pellets
+remain dynamic so their animations and collection state update immediately.
