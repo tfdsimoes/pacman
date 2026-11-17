@@ -28,6 +28,7 @@ class BoardLoaderTest {
                 new Position(12, 9), new Position(13, 9), new Position(14, 9), new Position(15, 9)),
                 board.ghostSpawns());
         assertEquals(Tile.WALL, board.tileAt(new Position(0, 0)));
+        assertEquals(Tile.WALL, board.tileAt(0, 0));
         assertEquals(Tile.POWER_PELLET, board.tileAt(new Position(1, 1)));
         assertEquals(Tile.EMPTY, board.tileAt(board.pacmanSpawn()));
     }
