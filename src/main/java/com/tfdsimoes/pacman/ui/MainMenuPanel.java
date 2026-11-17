@@ -1,5 +1,6 @@
 package com.tfdsimoes.pacman.ui;
 
+import com.tfdsimoes.pacman.GameConfig;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,7 +28,7 @@ public final class MainMenuPanel extends JPanel {
         Objects.requireNonNull(onModeSelected);
         setOpaque(false);
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(560, 440));
+        setPreferredSize(new Dimension(GameConfig.MAIN_MENU_WIDTH, GameConfig.MAIN_MENU_HEIGHT));
 
         JPanel content = new JPanel();
         content.setOpaque(false);
@@ -103,8 +104,8 @@ public final class MainMenuPanel extends JPanel {
     private static JButton createButton(String text) {
         JButton button = new JButton(text);
         button.setAlignmentX(CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(300, 50));
-        button.setPreferredSize(new Dimension(300, 50));
+        button.setMaximumSize(new Dimension(GameConfig.MAIN_MENU_BUTTON_WIDTH, GameConfig.MAIN_MENU_BUTTON_HEIGHT));
+        button.setPreferredSize(new Dimension(GameConfig.MAIN_MENU_BUTTON_WIDTH, GameConfig.MAIN_MENU_BUTTON_HEIGHT));
         button.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(34, 91, 196));

@@ -1,13 +1,12 @@
 package com.tfdsimoes.pacman.ui;
 
+import com.tfdsimoes.pacman.GameConfig;
 import com.tfdsimoes.pacman.logic.GameSession;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
 final class HudRenderer {
-    static final int HEIGHT = 48;
-
     private static final Color BACKGROUND_COLOR = new Color(8, 12, 38);
     private static final Color SEPARATOR_COLOR = new Color(48, 86, 170);
     private static final Color SCORE_COLOR = new Color(255, 224, 100);
@@ -19,9 +18,9 @@ final class HudRenderer {
 
     void render(Graphics2D canvas, GameSession game, boolean aiControlled, int width) {
         canvas.setColor(BACKGROUND_COLOR);
-        canvas.fillRect(0, 0, width, HEIGHT);
+        canvas.fillRect(0, 0, width, GameConfig.HUD_HEIGHT);
         canvas.setColor(SEPARATOR_COLOR);
-        canvas.drawLine(0, HEIGHT - 1, width, HEIGHT - 1);
+        canvas.drawLine(0, GameConfig.HUD_HEIGHT - 1, width, GameConfig.HUD_HEIGHT - 1);
         canvas.setFont(HUD_FONT);
         canvas.setColor(SCORE_COLOR);
         canvas.drawString("SCORE " + game.score(), 12, 20);
@@ -45,7 +44,7 @@ final class HudRenderer {
             return;
         }
         canvas.setColor(STATUS_OVERLAY_COLOR);
-        canvas.fillRect(0, HEIGHT, width, height - HEIGHT);
+        canvas.fillRect(0, GameConfig.HUD_HEIGHT, width, height - GameConfig.HUD_HEIGHT);
         canvas.setColor(game.gameOver() ? GAME_OVER_COLOR : Color.WHITE);
         canvas.setFont(STATUS_FONT);
         int textWidth = canvas.getFontMetrics().stringWidth(message);

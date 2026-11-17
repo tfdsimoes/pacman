@@ -61,3 +61,5 @@ remain dynamic so their animations and collection state update immediately.
 Rendering reuses drawing styles and sprite paths to limit per-frame allocations.
 Board rendering, HUD drawing, and keyboard input are separated from the timer-driven
 game panel to keep UI responsibilities focused.
+Gameplay scores, timing, movement speeds, and board/menu dimensions are centralized
+in `com.tfdsimoes.pacman.GameConfig`.

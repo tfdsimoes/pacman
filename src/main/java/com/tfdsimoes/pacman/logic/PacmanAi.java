@@ -1,5 +1,6 @@
 package com.tfdsimoes.pacman.logic;
 
+import com.tfdsimoes.pacman.GameConfig;
 import com.tfdsimoes.pacman.model.Board;
 import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Ghost;
@@ -17,8 +18,6 @@ import java.util.Queue;
 public final class PacmanAi implements PacmanController {
     private static final List<Direction> SEARCH_ORDER = List.of(
             Direction.UP, Direction.LEFT, Direction.DOWN, Direction.RIGHT);
-    private static final int GHOST_ALERT_DISTANCE = 14;
-
     @Override
     public Direction chooseDirection(GameSession game) {
         Objects.requireNonNull(game);
@@ -52,7 +51,7 @@ public final class PacmanAi implements PacmanController {
                 .filter(ghost -> ghost.mode() == GhostMode.NORMAL)
                 .map(ghost -> distances.get(ghost.position()))
                 .filter(Objects::nonNull)
-                .anyMatch(distance -> distance <= GHOST_ALERT_DISTANCE);
+                .anyMatch(distance -> distance <= GameConfig.PACMAN_GHOST_ALERT_DISTANCE);
         Position nearestPowerPellet = nearestCollectible(board, distances, Tile.POWER_PELLET);
         if (ghostNearby && nearestPowerPellet != null) {
             return nearestPowerPellet;

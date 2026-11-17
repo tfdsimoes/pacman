@@ -1,10 +1,9 @@
 package com.tfdsimoes.pacman.model;
 
+import com.tfdsimoes.pacman.GameConfig;
 import java.util.Objects;
 
 public final class Ghost {
-    private static final int EATEN_RETURN_TICKS = 10;
-
     private final GhostType type;
     private final Position spawn;
     private Position position;
@@ -78,7 +77,7 @@ public final class Ghost {
         previousPosition = spawn;
         mode = GhostMode.EATEN;
         frightenedTicksRemaining = 0;
-        eatenTicksRemaining = EATEN_RETURN_TICKS;
+        eatenTicksRemaining = GameConfig.GHOST_EATEN_RETURN_TICKS;
     }
 
     public void reset() {
