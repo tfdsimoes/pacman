@@ -5,11 +5,13 @@ import java.util.Objects;
 
 public final class Board {
     private final Tile[][] tiles;
+    private final Tile[][] initialTiles;
     private final Position pacmanSpawn;
     private final List<Position> ghostSpawns;
 
     public Board(Tile[][] tiles, Position pacmanSpawn, List<Position> ghostSpawns) {
-        this.tiles = copyTiles(tiles);
+        initialTiles = copyTiles(tiles);
+        this.tiles = copyTiles(initialTiles);
         this.pacmanSpawn = Objects.requireNonNull(pacmanSpawn);
         this.ghostSpawns = List.copyOf(ghostSpawns);
         if (this.tiles.length == 0 || this.tiles[0].length == 0) {
@@ -93,6 +95,12 @@ public final class Board {
             return tile;
         }
         return Tile.EMPTY;
+    }
+
+    public void reset() {
+        for (int y = 0; y < tiles.length; y++) {
+            System.arraycopy(initialTiles[y], 0, tiles[y], 0, tiles[y].length);
+        }
     }
 
     private static Tile[][] copyTiles(Tile[][] source) {

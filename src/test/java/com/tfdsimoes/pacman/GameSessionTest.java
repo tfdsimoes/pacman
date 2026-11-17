@@ -100,6 +100,48 @@ class GameSessionTest {
         assertEquals(GhostMode.NORMAL, game.ghosts().getFirst().mode());
     }
 
+    @Test
+    void advancesToResetBoardAndIncreasesSpeedAfterLevelClear() throws Exception {
+        var game = game("#####\n#P.G#\n#####");
+        game.pacman().requestDirection(Direction.RIGHT);
+
+        game.tick();
+
+        assertTrue(game.levelComplete());
+        assertEquals(1, game.level());
+        assertEquals(130, game.tickIntervalMillis());
+        for (int tick = 0; tick < 9; tick++) {
+            game.tick();
+        }
+        assertEquals(1, game.level());
+
+        game.tick();
+
+        assertEquals(2, game.level());
+        assertFalse(game.levelComplete());
+        assertEquals(122, game.tickIntervalMillis());
+        assertEquals(game.board().pacmanSpawn(), game.pacman().position());
+        assertEquals(1, game.board().collectibleCount());
+        assertEquals(10, game.score());
+    }
+
+    @Test
+    void gameOverAfterFinalLifeAndStopsFurtherUpdates() throws Exception {
+        var game = game("######\n#PG..#\n######");
+
+        for (int life = 0; life < 3; life++) {
+            game.pacman().requestDirection(Direction.RIGHT);
+            game.tick();
+        }
+
+        assertEquals(0, game.lives());
+        assertTrue(game.gameOver());
+        var position = game.pacman().position();
+        game.tick();
+        assertEquals(position, game.pacman().position());
+        assertEquals(0, game.lives());
+    }
+
     private static GameSession game(String layout) throws Exception {
         var board = BoardLoader.load(new ByteArrayInputStream(layout.getBytes(StandardCharsets.UTF_8)));
         return new GameSession(board, new Pacman(board.pacmanSpawn()));

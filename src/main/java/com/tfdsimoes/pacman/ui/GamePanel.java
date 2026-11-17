@@ -54,6 +54,10 @@ public final class GamePanel extends JPanel {
 
     public void tick() {
         game.tick();
+        timer.setDelay(game.tickIntervalMillis());
+        if (game.gameOver()) {
+            timer.stop();
+        }
         repaint();
     }
 
@@ -66,6 +70,7 @@ public final class GamePanel extends JPanel {
             drawBoard(canvas);
             drawGhosts(canvas);
             drawPacman(canvas);
+            drawStatus(canvas);
         } finally {
             canvas.dispose();
         }
@@ -98,7 +103,8 @@ public final class GamePanel extends JPanel {
         canvas.fillRect(0, 0, getWidth(), HUD_HEIGHT);
         canvas.setColor(Color.WHITE);
         canvas.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
-        canvas.drawString("SCORE " + game.score() + "       LIVES " + game.lives() + "       LEVEL 1", 10, 23);
+        canvas.drawString("SCORE " + game.score() + "       LIVES " + game.lives()
+                + "       LEVEL " + game.level(), 10, 23);
     }
 
     private void drawBoard(Graphics2D canvas) {
@@ -135,6 +141,19 @@ public final class GamePanel extends JPanel {
         canvas.setColor(PACMAN_COLOR);
         canvas.fillOval(position.x() * CELL_SIZE + 2, HUD_HEIGHT + position.y() * CELL_SIZE + 2,
                 CELL_SIZE - 4, CELL_SIZE - 4);
+    }
+
+    private void drawStatus(Graphics2D canvas) {
+        String message = game.gameOver() ? "GAME OVER" : game.levelComplete() ? "LEVEL COMPLETE" : null;
+        if (message == null) {
+            return;
+        }
+        canvas.setColor(new Color(0, 0, 0, 190));
+        canvas.fillRect(0, HUD_HEIGHT, getWidth(), getHeight() - HUD_HEIGHT);
+        canvas.setColor(game.gameOver() ? new Color(255, 70, 70) : Color.WHITE);
+        canvas.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 28));
+        int textWidth = canvas.getFontMetrics().stringWidth(message);
+        canvas.drawString(message, (getWidth() - textWidth) / 2, getHeight() / 2 + 14);
     }
 
     private Color ghostColor(Ghost ghost) {
