@@ -26,6 +26,7 @@ public final class GameSession {
     private final List<Ghost> ghosts;
     private final GhostAi ghostAi = new GhostAi();
     private final FruitManager fruitManager = new FruitManager();
+    private final PacmanController pacmanController;
     private int score;
     private int lives = 3;
     private int level = 1;
@@ -33,8 +34,13 @@ public final class GameSession {
     private int elapsedTicks;
 
     public GameSession(Board board, Pacman pacman) {
+        this(board, pacman, null);
+    }
+
+    public GameSession(Board board, Pacman pacman, PacmanController pacmanController) {
         this.board = Objects.requireNonNull(board);
         this.pacman = Objects.requireNonNull(pacman);
+        this.pacmanController = pacmanController;
         List<Ghost> ghosts = new ArrayList<>();
         for (int index = 0; index < board.ghostSpawns().size(); index++) {
             if (index >= GhostType.values().length) {
@@ -100,6 +106,9 @@ public final class GameSession {
             }
             return;
         }
+        if (pacmanController != null) {
+            pacman.requestDirection(pacmanController.chooseDirection(this));
+        }
         ghosts.forEach(Ghost::advanceModeTick);
         fruitManager.advance(board, level);
         pacman.tick(board);
@@ -145,6 +154,9 @@ public final class GameSession {
                 continue;
             }
             if (ghost.mode() == GhostMode.FRIGHTENED) {
+                score += GHOST_EAT_SCORE;
+                ghost.eat();
+            } else if (pacmanController != null && ghost.mode() == GhostMode.NORMAL) {
                 score += GHOST_EAT_SCORE;
                 ghost.eat();
             } else if (ghost.mode() == GhostMode.NORMAL) {

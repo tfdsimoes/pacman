@@ -38,15 +38,23 @@ public final class GamePanel extends JPanel {
 
     private final GameSession game;
     private final Timer timer;
+    private final boolean aiControlled;
     private int animationFrame;
 
     public GamePanel(GameSession game) {
+        this(game, false);
+    }
+
+    public GamePanel(GameSession game, boolean aiControlled) {
         this.game = Objects.requireNonNull(game);
+        this.aiControlled = aiControlled;
         Board board = game.board();
         setBackground(FLOOR_COLOR);
         setFocusable(true);
         setPreferredSize(new Dimension(board.width() * CELL_SIZE, HUD_HEIGHT + board.height() * CELL_SIZE));
-        configureKeyBindings();
+        if (!aiControlled) {
+            configureKeyBindings();
+        }
         timer = new Timer(TICK_MILLIS, event -> tick());
         timer.setCoalesce(true);
     }
@@ -126,7 +134,7 @@ public final class GamePanel extends JPanel {
         canvas.drawString(level, getWidth() - levelWidth - 12, 20);
         canvas.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
         canvas.setColor(PACMAN_COLOR);
-        String title = "PAC-MAN";
+        String title = aiControlled ? "PAC-MAN / AI" : "PAC-MAN";
         int titleWidth = canvas.getFontMetrics().stringWidth(title);
         canvas.drawString(title, (getWidth() - titleWidth) / 2, 41);
     }

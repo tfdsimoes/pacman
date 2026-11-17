@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tfdsimoes.pacman.logic.BoardLoader;
 import com.tfdsimoes.pacman.logic.GameSession;
+import com.tfdsimoes.pacman.logic.PacmanAi;
 import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.GhostMode;
 import com.tfdsimoes.pacman.model.Pacman;
@@ -140,6 +141,24 @@ class GameSessionTest {
         game.tick();
         assertEquals(position, game.pacman().position());
         assertEquals(0, game.lives());
+    }
+
+    @Test
+    void aiModeDefeatsNormalGhostsWithoutLosingLives() throws Exception {
+        var board = BoardLoader.load(new ByteArrayInputStream(
+                "#####\n#PG.#\n#####".getBytes(StandardCharsets.UTF_8)));
+        var game = new GameSession(board, new Pacman(board.pacmanSpawn()), new PacmanAi());
+
+        game.tick();
+
+        assertEquals(3, game.lives());
+        assertEquals(200, game.score());
+        assertEquals(GhostMode.EATEN, game.ghosts().getFirst().mode());
+
+        game.tick();
+
+        assertTrue(game.levelComplete());
+        assertEquals(210, game.score());
     }
 
     @Test
