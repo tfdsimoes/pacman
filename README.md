@@ -14,7 +14,7 @@ No Maven Wrapper is included.
 ```shell
 mvn clean verify
 mvn package
-java -jar target/pacman-1.0-SNAPSHOT.jar
+java -jar target/pacman-1.0.0.jar
 ```
 
 The application opens a Swing menu where you can choose to play yourself or
