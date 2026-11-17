@@ -5,11 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tfdsimoes.pacman.logic.BoardLoader;
+import com.tfdsimoes.pacman.model.Direction;
 import com.tfdsimoes.pacman.model.Position;
 import com.tfdsimoes.pacman.model.Tile;
 import com.tfdsimoes.pacman.ui.BoardRenderer;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class BoardLoaderTest {
@@ -55,6 +59,30 @@ class BoardLoaderTest {
                         new Position(spawn.x(), spawn.y() + 1))
                 .filter(board::contains)
                 .anyMatch(position -> board.tileAt(position) != Tile.WALL));
+    }
+
+    @Test
+    void everyClassicCollectibleIsReachableFromPacmanSpawn() throws Exception {
+        var board = BoardLoader.loadResource("/boards/classic.txt");
+        Set<Position> reachable = new HashSet<>();
+        var pending = new ArrayDeque<Position>();
+        reachable.add(board.pacmanSpawn());
+        pending.add(board.pacmanSpawn());
+        while (!pending.isEmpty()) {
+            Position current = pending.remove();
+            for (Direction direction : Direction.values()) {
+                Position next = board.neighbor(current, direction);
+                if (next != null && reachable.add(next)) {
+                    pending.add(next);
+                }
+            }
+        }
+
+        long reachableCollectibles = reachable.stream()
+                .filter(position -> board.tileAt(position) == Tile.PELLET
+                        || board.tileAt(position) == Tile.POWER_PELLET)
+                .count();
+        assertEquals(board.collectibleCount(), reachableCollectibles);
     }
 
     @Test
