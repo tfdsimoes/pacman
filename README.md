@@ -17,8 +17,9 @@ mvn package
 java -jar target/pacman-1.0-SNAPSHOT.jar
 ```
 
-The application opens a Swing window with the maze and Pac-Man. The board layout
-is in `src/main/resources/boards/classic.txt`.
+The application opens a Swing window with an expanded 29-by-21 maze and a
+refreshed, antialiased arcade-style presentation. The board layout is in
+`src/main/resources/boards/classic.txt`.
 
 Use the arrow keys or WASD to move. Movement uses grid ticks with buffered turns,
 wall collision, and horizontal wrap-around at the open tunnel endpoints.
@@ -43,3 +44,8 @@ awards 100 points per level when Pac-Man reaches its location.
 The UTF-8 board resource is a rectangular grid. `#` is a wall, `.` a pellet,
 `o` a power pellet, `P` Pac-Man's spawn, and `G` a ghost spawn. Spawn markers
 are treated as empty floor tiles by the board model.
+
+The expanded maze has four ghost spawn tiles, corner power pellets, and a
+horizontal tunnel through its center row. Wall blocks, pellets, Pac-Man, and
+ghosts are drawn with Java2D shapes and gradients; the graphics use no external
+image assets.

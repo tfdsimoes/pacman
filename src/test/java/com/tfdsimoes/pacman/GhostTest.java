@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 
 class GhostTest {
     @Test
-    void createsFourGhostsAtClassicSpawnPositions() throws Exception {
+    void createsFourGhostsAtExpandedMapSpawnPositions() throws Exception {
         var board = BoardLoader.loadResource("/boards/classic.txt");
         var game = new GameSession(board, new Pacman(board.pacmanSpawn()));
 
         assertEquals(4, game.ghosts().size());
         assertEquals(GhostType.BLINKY, game.ghosts().get(0).type());
-        assertEquals(new Position(6, 8), game.ghosts().get(0).position());
+        assertEquals(new Position(12, 9), game.ghosts().get(0).position());
     }
 
     @Test
