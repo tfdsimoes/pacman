@@ -42,6 +42,8 @@ scatter and chase phases before remaining in chase mode.
 Pinky targets four tiles ahead of Pac-Man, including the original up-direction
 overflow offset. Inky doubles the vector from Blinky to a point two tiles ahead
 of Pac-Man.
+Clyde chases when he is at least eight tiles from Pac-Man and otherwise
+retreats to his scatter corner.
 The game starts with three lives. Clearing the maze advances to a reset board
 after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.

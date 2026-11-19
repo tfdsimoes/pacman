@@ -46,7 +46,7 @@ public final class GhostAi {
             case BLINKY -> player;
             case PINKY -> pinkyTarget(board, pacman);
             case INKY -> inkyTarget(board, pacman, blinkyPosition(ghosts, ghost));
-            case CLYDE -> squaredDistance(ghost.position(), player) > 64
+            case CLYDE -> squaredDistance(ghost.position(), player) >= 64
                     ? player : scatterTarget(board, GhostType.CLYDE);
         };
         return normalizeTunnelTarget(board, target);

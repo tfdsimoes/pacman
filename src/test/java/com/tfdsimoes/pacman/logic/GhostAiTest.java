@@ -135,6 +135,26 @@ class GhostAiTest {
                 board, inky, pacman, GhostStrategyMode.CHASE, List.of(blinky, inky)));
     }
 
+    @Test
+    void clydeChasesAtExactlyEightTiles() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(1, 3));
+        var clyde = new Ghost(GhostType.CLYDE, new Position(9, 3));
+
+        assertEquals(pacman.position(), new GhostAi().targetFor(
+                board, clyde, pacman, GhostStrategyMode.CHASE, List.of(clyde)));
+    }
+
+    @Test
+    void clydeScattersWhenCloserThanEightTiles() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(2, 3));
+        var clyde = new Ghost(GhostType.CLYDE, new Position(9, 3));
+
+        assertEquals(new Position(1, 5), new GhostAi().targetFor(
+                board, clyde, pacman, GhostStrategyMode.CHASE, List.of(clyde)));
+    }
+
     private static com.tfdsimoes.pacman.model.Board board() throws Exception {
         String layout = String.join("\n",
                 "###########",
