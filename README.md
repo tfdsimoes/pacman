@@ -17,6 +17,9 @@ mvn package
 java -jar target/pacman-1.1.0-SNAPSHOT.jar
 ```
 
+GitHub Actions runs `mvn clean verify` for pushes and pull requests targeting
+`main` or `develop`.
+
 The application opens a Swing menu where you can choose to play yourself or
 watch the autonomous Pac-Man AI. Both modes use the 29-by-21 maze with
 antialiased arcade-style graphics. The board layout is in
