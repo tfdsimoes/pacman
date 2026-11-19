@@ -110,6 +110,18 @@ class GhostAiTest {
                 board, pinky, pacman, GhostStrategyMode.CHASE, List.of(pinky)));
     }
 
+    @Test
+    void pinkyTargetIncludesUpDirectionOverflowOffset() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(5, 3));
+        pacman.requestDirection(Direction.UP);
+        pacman.tick(board);
+        var pinky = new Ghost(GhostType.PINKY, new Position(1, 3));
+
+        assertEquals(new Position(1, -2), new GhostAi().targetFor(
+                board, pinky, pacman, GhostStrategyMode.CHASE, List.of(pinky)));
+    }
+
     private static com.tfdsimoes.pacman.model.Board board() throws Exception {
         String layout = String.join("\n",
                 "###########",

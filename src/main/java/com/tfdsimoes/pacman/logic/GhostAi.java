@@ -44,7 +44,7 @@ public final class GhostAi {
         Position player = pacman.position();
         Position target = switch (ghost.type()) {
             case BLINKY -> player;
-            case PINKY -> aheadOf(board, pacman, 4);
+            case PINKY -> pinkyTarget(board, pacman);
             case INKY -> inkyTarget(board, pacman, blinkyPosition(ghosts, ghost));
             case CLYDE -> squaredDistance(ghost.position(), player) > 64
                     ? player : scatterTarget(board, GhostType.CLYDE);
@@ -90,6 +90,14 @@ public final class GhostAi {
         return normalizeTunnelTarget(board, new Position(
                 pacman.position().x() + direction.dx() * tiles,
                 pacman.position().y() + direction.dy() * tiles));
+    }
+
+    private static Position pinkyTarget(Board board, Pacman pacman) {
+        Position ahead = aheadOf(board, pacman, 4);
+        if (pacman.direction() == Direction.UP) {
+            ahead = new Position(ahead.x() - 4, ahead.y());
+        }
+        return ahead;
     }
 
     private static Position inkyTarget(Board board, Pacman pacman, Position blinky) {
