@@ -101,9 +101,13 @@ public final class GhostAi {
     }
 
     private static Position inkyTarget(Board board, Pacman pacman, Position blinky) {
-        Position ahead = aheadOf(board, pacman, 2);
+        Position pivot = aheadOf(board, pacman, 2);
+        int vectorX = pivot.x() - blinky.x();
+        int vectorY = pivot.y() - blinky.y();
         return normalizeTunnelTarget(board,
-                new Position(2 * ahead.x() - blinky.x(), 2 * ahead.y() - blinky.y()));
+                new Position(
+                        blinky.x() + 2 * vectorX,
+                        blinky.y() + 2 * vectorY));
     }
 
     private static Position blinkyPosition(List<Ghost> ghosts, Ghost fallback) {

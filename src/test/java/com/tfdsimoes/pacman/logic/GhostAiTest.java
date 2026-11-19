@@ -122,6 +122,19 @@ class GhostAiTest {
                 board, pinky, pacman, GhostStrategyMode.CHASE, List.of(pinky)));
     }
 
+    @Test
+    void inkyDoublesVectorFromBlinkyToTwoTilesAhead() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(5, 3));
+        pacman.requestDirection(Direction.UP);
+        pacman.tick(board);
+        var blinky = new Ghost(GhostType.BLINKY, new Position(3, 1));
+        var inky = new Ghost(GhostType.INKY, new Position(1, 3));
+
+        assertEquals(new Position(7, -1), new GhostAi().targetFor(
+                board, inky, pacman, GhostStrategyMode.CHASE, List.of(blinky, inky)));
+    }
+
     private static com.tfdsimoes.pacman.model.Board board() throws Exception {
         String layout = String.join("\n",
                 "###########",
