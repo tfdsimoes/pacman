@@ -22,6 +22,7 @@ public final class GameConfig {
     public static final int MIN_LOGIC_TICK_MILLIS = 60;
     public static final int RENDER_FRAME_MILLIS = 16;
     public static final int PACMAN_GHOST_ALERT_DISTANCE = 14;
+    public static final int PACMAN_DEAD_END_DANGER_PENALTY = 2;
 
     public static final int CELL_SIZE = 26;
     public static final int HUD_HEIGHT = 48;

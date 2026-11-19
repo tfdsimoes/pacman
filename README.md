@@ -49,10 +49,12 @@ after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.
 Bonus fruit appears on a timer, remains available for a limited duration, and
 awards 100 points per level when Pac-Man reaches its location.
-The AI mode autonomously routes to the nearest remaining collectible and
-prioritizes power pellets when normal ghosts are nearby. It follows the same
-collision rules as human mode: normal ghosts cost a life, while frightened
-ghosts can be eaten for bonus points.
+The AI mode routes to nearby frightened ghosts, prioritizes power pellets when
+normal ghosts are nearby, and otherwise seeks the nearest collectible. While
+threatened, it favors routes that increase distance from normal ghosts and
+avoids immediate dead ends. It follows the same collision rules as human mode:
+normal ghosts cost a life, while frightened ghosts can be eaten for bonus
+points.
 
 ## Board layout
 
