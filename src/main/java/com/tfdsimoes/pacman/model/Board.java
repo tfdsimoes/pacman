@@ -28,6 +28,10 @@ public final class Board {
         if (!contains(pacmanSpawn) || this.ghostSpawns.stream().anyMatch(spawn -> !contains(spawn))) {
             throw new IllegalArgumentException("Spawn positions must be inside the board");
         }
+        if (tileAt(pacmanSpawn) == Tile.WALL
+                || this.ghostSpawns.stream().anyMatch(spawn -> tileAt(spawn) == Tile.WALL)) {
+            throw new IllegalArgumentException("Spawn positions must be on open tiles");
+        }
     }
 
     public int width() {

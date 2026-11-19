@@ -8,17 +8,24 @@ import com.tfdsimoes.pacman.model.GhostStrategyMode;
 import com.tfdsimoes.pacman.model.GhostType;
 import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
+import java.util.Random;
 
 public final class GhostAi {
     private static final List<Direction> SEARCH_ORDER = List.of(
             Direction.UP, Direction.LEFT, Direction.DOWN, Direction.RIGHT);
+
+    private final Random random;
+
+    public GhostAi() {
+        this(new Random());
+    }
+
+    GhostAi(Random random) {
+        this.random = Objects.requireNonNull(random);
+    }
 
     public Position targetFor(Board board, Ghost ghost, Pacman pacman,
             GhostStrategyMode strategyMode, List<Ghost> ghosts) {
@@ -37,9 +44,9 @@ public final class GhostAi {
         Position player = pacman.position();
         Position target = switch (ghost.type()) {
             case BLINKY -> player;
-            case PINKY -> aheadOf(board, pacman, 4);
+            case PINKY -> pinkyTarget(board, pacman);
             case INKY -> inkyTarget(board, pacman, blinkyPosition(ghosts, ghost));
-            case CLYDE -> squaredDistance(ghost.position(), player) > 64
+            case CLYDE -> squaredDistance(ghost.position(), player) >= 64
                     ? player : scatterTarget(board, GhostType.CLYDE);
         };
         return normalizeTunnelTarget(board, target);
@@ -59,16 +66,18 @@ public final class GhostAi {
         if (options.isEmpty()) {
             return Direction.STOPPED;
         }
+        if (ghost.mode() == GhostMode.FRIGHTENED) {
+            return options.get(random.nextInt(options.size()));
+        }
 
-        boolean frightened = ghost.mode() == GhostMode.FRIGHTENED;
-        Position target = frightened ? pacman.position()
-                : board.nearestOpenPosition(targetFor(board, ghost, pacman, strategyMode, ghosts));
+        Position target = board.nearestOpenPosition(
+                targetFor(board, ghost, pacman, strategyMode, ghosts));
         Direction bestDirection = options.getFirst();
-        int bestDistance = frightened ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        long bestDistance = Long.MAX_VALUE;
         for (Direction direction : options) {
             Position candidate = board.neighbor(ghost.position(), direction);
-            int distance = shortestDistance(board, candidate, target);
-            if (frightened ? distance > bestDistance : distance < bestDistance) {
+            long distance = squaredDistance(candidate, target);
+            if (distance < bestDistance) {
                 bestDistance = distance;
                 bestDirection = direction;
             }
@@ -83,10 +92,22 @@ public final class GhostAi {
                 pacman.position().y() + direction.dy() * tiles));
     }
 
+    private static Position pinkyTarget(Board board, Pacman pacman) {
+        Position ahead = aheadOf(board, pacman, 4);
+        if (pacman.direction() == Direction.UP) {
+            ahead = new Position(ahead.x() - 4, ahead.y());
+        }
+        return ahead;
+    }
+
     private static Position inkyTarget(Board board, Pacman pacman, Position blinky) {
-        Position ahead = aheadOf(board, pacman, 2);
+        Position pivot = aheadOf(board, pacman, 2);
+        int vectorX = pivot.x() - blinky.x();
+        int vectorY = pivot.y() - blinky.y();
         return normalizeTunnelTarget(board,
-                new Position(2 * ahead.x() - blinky.x(), 2 * ahead.y() - blinky.y()));
+                new Position(
+                        blinky.x() + 2 * vectorX,
+                        blinky.y() + 2 * vectorY));
     }
 
     private static Position blinkyPosition(List<Ghost> ghosts, Ghost fallback) {
@@ -117,28 +138,6 @@ public final class GhostAi {
             return new Position(Math.floorMod(target.x(), board.width()), target.y());
         }
         return target;
-    }
-
-    private static int shortestDistance(Board board, Position start, Position target) {
-        Queue<Position> queue = new ArrayDeque<>();
-        Map<Position, Integer> distances = new HashMap<>();
-        queue.add(start);
-        distances.put(start, 0);
-        while (!queue.isEmpty()) {
-            Position current = queue.remove();
-            int distance = distances.get(current);
-            if (current.equals(target)) {
-                return distance;
-            }
-            for (Direction direction : SEARCH_ORDER) {
-                Position neighbor = board.neighbor(current, direction);
-                if (neighbor != null && !distances.containsKey(neighbor)) {
-                    distances.put(neighbor, distance + 1);
-                    queue.add(neighbor);
-                }
-            }
-        }
-        return Integer.MAX_VALUE;
     }
 
     private static long squaredDistance(Position first, Position second) {

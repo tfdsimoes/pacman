@@ -14,13 +14,18 @@ No Maven Wrapper is included.
 ```shell
 mvn clean verify
 mvn package
-java -jar target/pacman-1.0.0.jar
+java -jar target/pacman-1.1.0.jar
 ```
+
+GitHub Actions runs `mvn clean verify` for pushes and pull requests targeting
+`main` or `develop`.
 
 The application opens a Swing menu where you can choose to play yourself or
 watch the autonomous Pac-Man AI. Both modes use the 29-by-21 maze with
 antialiased arcade-style graphics. The board layout is in
 `src/main/resources/boards/classic.txt`.
+Board spawn positions must be on open tiles; the board model validates this
+invariant for both loaded and programmatically created mazes.
 
 In human mode, use the arrow keys or WASD to move. Movement uses grid ticks with
 buffered turns, wall collision, and horizontal wrap-around at the open tunnel endpoints.
@@ -34,18 +39,27 @@ Pac-Man/ghost tile swap during one logic tick also counts as a collision.
 Power pellets frighten active ghosts for 70 game ticks; eating a frightened
 ghost awards 200 bonus points and sends it back to the ghost house before it
 re-enters play.
-Ghosts move through the maze using deterministic shortest-path pursuit and
-per-ghost target behaviors. They alternate scatter and chase phases before
-remaining in chase mode.
+Ghosts move through the maze using per-ghost target behaviors. At each step a
+ghost picks the reachable neighbor closest (Euclidean) to its target, breaking
+ties in UP, LEFT, DOWN, RIGHT order, and never reverses unless it has no other
+option. Frightened ghosts choose a random non-reversing direction. They alternate
+scatter and chase phases before remaining in chase mode.
+Pinky targets four tiles ahead of Pac-Man, including the original up-direction
+overflow offset. Inky doubles the vector from Blinky to a point two tiles ahead
+of Pac-Man.
+Clyde chases when he is at least eight tiles from Pac-Man and otherwise
+retreats to his scatter corner.
 The game starts with three lives. Clearing the maze advances to a reset board
 after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.
 Bonus fruit appears on a timer, remains available for a limited duration, and
 awards 100 points per level when Pac-Man reaches its location.
-The AI mode autonomously routes to the nearest remaining collectible and
-prioritizes power pellets when normal ghosts are nearby. It follows the same
-collision rules as human mode: normal ghosts cost a life, while frightened
-ghosts can be eaten for bonus points.
+The AI mode routes to nearby frightened ghosts, prioritizes power pellets when
+normal ghosts are nearby, and otherwise seeks the nearest collectible. While
+threatened, it favors routes that increase distance from normal ghosts and
+avoids immediate dead ends. It follows the same collision rules as human mode:
+normal ghosts cost a life, while frightened ghosts can be eaten for bonus
+points.
 
 ## Board layout
 
