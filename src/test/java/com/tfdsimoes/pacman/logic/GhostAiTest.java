@@ -10,7 +10,10 @@ import com.tfdsimoes.pacman.model.Pacman;
 import com.tfdsimoes.pacman.model.Position;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class GhostAiTest {
@@ -38,7 +41,7 @@ class GhostAiTest {
     }
 
     @Test
-    void choosesShortestPathTowardChaseTarget() throws Exception {
+    void choosesDirectionClosestToChaseTarget() throws Exception {
         var board = board();
         var pacman = new Pacman(new Position(5, 3));
         var blinky = new Ghost(GhostType.BLINKY, new Position(1, 3));
@@ -46,6 +49,47 @@ class GhostAiTest {
         assertEquals(Direction.RIGHT,
                 new GhostAi().chooseDirection(
                         board, blinky, pacman, GhostStrategyMode.CHASE, List.of(blinky)));
+    }
+
+    @Test
+    void breaksDistanceTiesInUpLeftDownRightOrder() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(6, 2));
+        var blinky = new Ghost(GhostType.BLINKY, new Position(5, 3));
+
+        assertEquals(Direction.UP,
+                new GhostAi().chooseDirection(
+                        board, blinky, pacman, GhostStrategyMode.CHASE, List.of(blinky)));
+    }
+
+    @Test
+    void neverReversesWhileAnotherDirectionIsAvailable() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(2, 3));
+        var blinky = new Ghost(GhostType.BLINKY, new Position(4, 3));
+        blinky.move(Direction.RIGHT, new Position(5, 3));
+
+        assertEquals(Direction.UP,
+                new GhostAi().chooseDirection(
+                        board, blinky, pacman, GhostStrategyMode.CHASE, List.of(blinky)));
+    }
+
+    @Test
+    void frightenedGhostChoosesRandomNonReversingDirection() throws Exception {
+        var board = board();
+        var pacman = new Pacman(new Position(2, 3));
+        var blinky = new Ghost(GhostType.BLINKY, new Position(4, 3));
+        blinky.move(Direction.RIGHT, new Position(5, 3));
+        blinky.frightenFor(10);
+        var ai = new GhostAi(new Random(42));
+        Set<Direction> chosen = EnumSet.noneOf(Direction.class);
+
+        for (int tick = 0; tick < 100; tick++) {
+            chosen.add(ai.chooseDirection(
+                    board, blinky, pacman, GhostStrategyMode.CHASE, List.of(blinky)));
+        }
+
+        assertEquals(EnumSet.of(Direction.UP, Direction.DOWN, Direction.RIGHT), chosen);
     }
 
     @Test

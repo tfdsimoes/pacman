@@ -34,8 +34,10 @@ Pac-Man/ghost tile swap during one logic tick also counts as a collision.
 Power pellets frighten active ghosts for 70 game ticks; eating a frightened
 ghost awards 200 bonus points and sends it back to the ghost house before it
 re-enters play.
-Ghosts move through the maze using deterministic shortest-path pursuit and
-per-ghost target behaviors. They alternate scatter and chase phases before
+Ghosts move through the maze using per-ghost target behaviors. At each step a
+ghost picks the reachable neighbor closest (Euclidean) to its target, breaking
+ties in UP, LEFT, DOWN, RIGHT order, and never reverses unless it has no other
+option. Frightened ghosts choose a random non-reversing direction. They alternate scatter and chase phases before
 remaining in chase mode.
 The game starts with three lives. Clearing the maze advances to a reset board
 after a brief level-clear display, with movement speeding up by level; losing
