@@ -24,20 +24,30 @@ public final class PacmanAi implements PacmanController {
         Board board = game.board();
         Position current = game.pacman().position();
         Map<Position, Integer> currentDistances = distancesFrom(board, current);
-        Position target = selectTarget(game, currentDistances);
+        boolean threatened = nearestNormalGhostDistance(game, currentDistances)
+                <= GameConfig.PACMAN_GHOST_ALERT_DISTANCE;
+        Position target = selectTarget(game, currentDistances, threatened);
         if (target == null) {
             return Direction.STOPPED;
         }
 
         Direction bestDirection = Direction.STOPPED;
         int bestDistance = Integer.MAX_VALUE;
+        long bestSafety = Long.MIN_VALUE;
         for (Direction direction : SEARCH_ORDER) {
             Position candidate = board.neighbor(current, direction);
             if (candidate == null) {
                 continue;
             }
-            int distance = distancesFrom(board, candidate).getOrDefault(target, Integer.MAX_VALUE);
-            if (distance < bestDistance) {
+            Map<Position, Integer> candidateDistances = distancesFrom(board, candidate);
+            int distance = candidateDistances.getOrDefault(target, Integer.MAX_VALUE);
+            long safety = threatened
+                    ? safetyScore(game, candidateDistances, isDeadEnd(board, candidate, current))
+                    : 0;
+            if (threatened
+                    ? safety > bestSafety || safety == bestSafety && distance < bestDistance
+                    : distance < bestDistance) {
+                bestSafety = safety;
                 bestDistance = distance;
                 bestDirection = direction;
             }
@@ -45,18 +55,65 @@ public final class PacmanAi implements PacmanController {
         return bestDirection;
     }
 
-    private Position selectTarget(GameSession game, Map<Position, Integer> distances) {
+    private Position selectTarget(GameSession game, Map<Position, Integer> distances, boolean threatened) {
         Board board = game.board();
-        boolean ghostNearby = game.ghosts().stream()
-                .filter(ghost -> ghost.mode() == GhostMode.NORMAL)
-                .map(ghost -> distances.get(ghost.position()))
-                .filter(Objects::nonNull)
-                .anyMatch(distance -> distance <= GameConfig.PACMAN_GHOST_ALERT_DISTANCE);
-        Position nearestPowerPellet = nearestCollectible(board, distances, Tile.POWER_PELLET);
-        if (ghostNearby && nearestPowerPellet != null) {
-            return nearestPowerPellet;
+        if (threatened) {
+            Position nearestPowerPellet = nearestCollectible(board, distances, Tile.POWER_PELLET);
+            if (nearestPowerPellet != null) {
+                return nearestPowerPellet;
+            }
+        } else {
+            Position nearestFrightenedGhost = nearestGhost(game, distances, GhostMode.FRIGHTENED);
+            if (nearestFrightenedGhost != null
+                    && distances.get(nearestFrightenedGhost) <= GameConfig.PACMAN_GHOST_ALERT_DISTANCE) {
+                return nearestFrightenedGhost;
+            }
         }
         return nearestCollectible(board, distances, null);
+    }
+
+    private static Position nearestGhost(
+            GameSession game, Map<Position, Integer> distances, GhostMode mode) {
+        Position nearest = null;
+        int bestDistance = Integer.MAX_VALUE;
+        for (Ghost ghost : game.ghosts()) {
+            if (ghost.mode() != mode) {
+                continue;
+            }
+            int distance = distances.getOrDefault(ghost.position(), Integer.MAX_VALUE);
+            if (distance < bestDistance) {
+                nearest = ghost.position();
+                bestDistance = distance;
+            }
+        }
+        return nearest;
+    }
+
+    private static int nearestNormalGhostDistance(GameSession game, Map<Position, Integer> distances) {
+        return game.ghosts().stream()
+                .filter(ghost -> ghost.mode() == GhostMode.NORMAL)
+                .mapToInt(ghost -> distances.getOrDefault(ghost.position(), Integer.MAX_VALUE))
+                .min()
+                .orElse(Integer.MAX_VALUE);
+    }
+
+    private static long safetyScore(
+            GameSession game, Map<Position, Integer> distances, boolean deadEnd) {
+        int dangerDistance = nearestNormalGhostDistance(game, distances);
+        if (dangerDistance == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        return dangerDistance - (deadEnd ? GameConfig.PACMAN_DEAD_END_DANGER_PENALTY : 0);
+    }
+
+    private static boolean isDeadEnd(Board board, Position position, Position previousPosition) {
+        for (Direction direction : SEARCH_ORDER) {
+            Position neighbor = board.neighbor(position, direction);
+            if (neighbor != null && !neighbor.equals(previousPosition)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Position nearestCollectible(Board board, Map<Position, Integer> distances, Tile requestedTile) {
