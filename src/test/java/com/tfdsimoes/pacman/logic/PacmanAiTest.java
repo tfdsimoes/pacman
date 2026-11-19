@@ -33,6 +33,13 @@ class PacmanAiTest {
     }
 
     @Test
+    void prioritizesPowerPelletWhenNormalGhostIsNearby() throws Exception {
+        var game = game("#########\n#   G   #\n#o  P . #\n#       #\n#########");
+
+        assertEquals(Direction.LEFT, new PacmanAi().chooseDirection(game));
+    }
+
+    @Test
     void avoidsEnteringADeadEndWhenThreatened() throws Exception {
         var game = game("#########\n#########\n###.#####\n#..P....#\n###G#####\n#########");
 
