@@ -14,7 +14,7 @@ No Maven Wrapper is included.
 ```shell
 mvn clean verify
 mvn package
-java -jar target/pacman-1.1.0-SNAPSHOT.jar
+java -jar target/pacman-1.1.0.jar
 ```
 
 GitHub Actions runs `mvn clean verify` for pushes and pull requests targeting
