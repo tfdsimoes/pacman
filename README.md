@@ -39,6 +39,8 @@ ghost picks the reachable neighbor closest (Euclidean) to its target, breaking
 ties in UP, LEFT, DOWN, RIGHT order, and never reverses unless it has no other
 option. Frightened ghosts choose a random non-reversing direction. They alternate
 scatter and chase phases before remaining in chase mode.
+Pinky targets four tiles ahead of Pac-Man, including the original up-direction
+overflow offset.
 The game starts with three lives. Clearing the maze advances to a reset board
 after a brief level-clear display, with movement speeding up by level; losing
 all lives ends the game.
