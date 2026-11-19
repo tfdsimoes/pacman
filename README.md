@@ -24,6 +24,8 @@ The application opens a Swing menu where you can choose to play yourself or
 watch the autonomous Pac-Man AI. Both modes use the 29-by-21 maze with
 antialiased arcade-style graphics. The board layout is in
 `src/main/resources/boards/classic.txt`.
+Board spawn positions must be on open tiles; the board model validates this
+invariant for both loaded and programmatically created mazes.
 
 In human mode, use the arrow keys or WASD to move. Movement uses grid ticks with
 buffered turns, wall collision, and horizontal wrap-around at the open tunnel endpoints.
